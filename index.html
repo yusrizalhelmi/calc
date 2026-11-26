@@ -1,0 +1,2145 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kalkulator HPP — Harga Pokok Penjualan, Perencanaan Target Omset & BEP</title>
+<meta name="description" content="Kalkulator HPP (Harga Pokok Penjualan) gratis. Mode Manufaktur, Dagang, Jasa. Hitung HPP per unit, harga jual, margin, BEP, fee marketplace, plus perencanaan target omset harian/mingguan/bulanan. Data tersimpan di perangkat Anda.">
+<meta name="theme-color" content="#1E3A5F">
+<meta name="author" content="Ratakiri">
+<meta name="keywords" content="kalkulator HPP, harga pokok penjualan, margin, BEP, break even point, target omset, UMKM, perencanaan usaha">
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.json">
+<link rel="canonical" href="https://ratakiri.github.io/kalkulator-hpp/">
+
+<!-- Open Graph -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="Kalkulator HPP & Perencanaan Target Omset">
+<meta property="og:description" content="Hitung HPP per unit, harga jual, margin, BEP, dan rencanakan target omset harian/mingguan/bulanan. Gratis, data tersimpan di perangkat Anda.">
+<meta property="og:image" content="https://ratakiri.github.io/kalkulator-hpp/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://ratakiri.github.io/kalkulator-hpp/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:site_name" content="Kalkulator HPP">
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kalkulator HPP & Perencanaan Target Omset">
+<meta name="twitter:description" content="Hitung HPP, margin, BEP, dan rencanakan target omset usaha Anda. Gratis.">
+<meta name="twitter:image" content="https://ratakiri.github.io/kalkulator-hpp/og-image.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --navy:#1E3A5F;
+    --navy-soft:#3a5478;
+    --blue-card:#A9DFF7;
+    --blue-card-2:#9FDBF5;
+    --cream:#FBF7F0;
+    --orange-1:#F7B733;
+    --orange-2:#E8890C;
+    --gray-suffix:#64748B;
+    --gray-line:rgba(0,0,0,.06);
+    --focus-ring:0 0 0 3px rgba(247,183,51,.55);
+    --shadow-card:0 10px 30px rgba(0,0,0,.25);
+    --shadow-btn:0 4px 10px rgba(232,137,12,.45);
+    --radius-card:22px;
+    --radius-pill:20px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{
+    font-family:'Nunito',system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    color:var(--navy);
+    background:#0f172a;
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:flex-start;
+    padding:32px 16px 48px;
+    position:relative;
+    overflow-x:hidden;
+  }
+  /* Blurred backdrop + dim overlay */
+  .backdrop{
+    position:fixed;inset:0;z-index:-2;
+    background:
+      radial-gradient(1200px 600px at 20% 10%, #2b3a55 0%, transparent 60%),
+      radial-gradient(900px 500px at 90% 90%, #243049 0%, transparent 60%),
+      linear-gradient(135deg,#1a2438 0%, #11192b 100%);
+    filter:saturate(0.8);
+  }
+  .backdrop::after{
+    content:"";position:absolute;inset:0;
+    background:rgba(20,24,38,0.55);
+  }
+
+  .app{
+    width:100%;
+    max-width:920px;
+    display:grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap:0;
+    align-items:stretch;
+    position:relative;
+    z-index:1;
+    flex-shrink:0;
+  }
+
+  /* WHITE CARD (left) */
+  .card-white{
+    background:#fff;
+    border-radius:var(--radius-card);
+    box-shadow:var(--shadow-card);
+    padding:30px 26px 24px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+    z-index:2;
+    margin-right:-14px;
+  }
+  .title{line-height:1.18;letter-spacing:.2px;margin:0;font:inherit}
+  .title .accent{
+    display:block;
+    background:linear-gradient(135deg,#F7B733 0%, #E8890C 50%, #C7740A 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    -webkit-text-fill-color:transparent;
+    font-weight:900;font-size:clamp(1.4rem,2.4vw,1.85rem);
+  }
+  .title .main{
+    display:block;
+    color:var(--navy);font-weight:900;font-size:clamp(1.4rem,2.4vw,1.85rem);
+  }
+  .subtitle{margin-top:6px;color:var(--navy-soft);font-size:.82rem;font-weight:600;line-height:1.4}
+
+  .illu{
+    flex:1;
+    display:flex;align-items:center;justify-content:center;
+    position:relative;
+    min-height:200px;
+    margin-top:10px;
+  }
+  .illu svg{width:100%;height:auto;max-width:240px;filter:drop-shadow(0 14px 18px rgba(30,58,95,.25))}
+
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+  .chip{
+    font-size:.68rem;font-weight:700;color:var(--navy);
+    background:var(--cream);border:1px solid var(--gray-line);
+    padding:5px 10px;border-radius:999px;display:inline-flex;align-items:center;gap:4px;
+  }
+
+  /* BLUE CARD (right) */
+  .card-blue{
+    background:linear-gradient(180deg,var(--blue-card) 0%, var(--blue-card-2) 100%);
+    border-radius:var(--radius-card);
+    box-shadow:var(--shadow-card);
+    padding:26px 28px 24px;
+    position:relative;
+    z-index:1;
+  }
+
+  .form-row{display:flex;flex-direction:column;gap:6px;margin-bottom:13px}
+  .form-row label{font-size:.8rem;font-weight:700;color:var(--navy);line-height:1.25}
+  .field{
+    display:flex;align-items:center;gap:8px;flex-wrap:wrap;
+  }
+  .pill{
+    flex:1;min-width:0;
+    display:flex;align-items:center;
+    background:#fff;
+    border:1px solid rgba(255,255,255,.7);
+    border-radius:var(--radius-pill);
+    padding:9px 14px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.03);
+    min-height:40px;
+    transition:box-shadow .15s ease;
+  }
+  .pill:focus-within,.sel:focus-within{box-shadow:inset 0 0 0 1px rgba(0,0,0,.03), var(--focus-ring)}
+  .pill input, .pill select{
+    border:none;outline:none;background:transparent;
+    width:100%;font:inherit;color:var(--navy);font-weight:600;font-size:.92rem;
+  }
+  .pill select, .sel select{
+    -webkit-appearance:none;-moz-appearance:none;appearance:none;
+    padding-right:14px;
+  }
+  .pill select::-ms-expand, .sel select::-ms-expand{display:none}
+  .pill .suffix{
+    color:var(--gray-suffix);font-weight:700;font-size:.82rem;margin-left:6px;white-space:nowrap;
+  }
+  .pill .pfx{
+    color:var(--navy-soft);font-weight:800;font-size:.92rem;margin-right:4px;
+  }
+  .pill select, .sel select{cursor:pointer}
+
+  .field .sel{
+    flex:0 0 auto;
+    display:flex;align-items:center;gap:6px;
+    background:#fff;border-radius:var(--radius-pill);
+    padding:9px 12px;min-height:40px;
+    box-shadow:inset 0 0 0 1px rgba(0,0,0,.03);
+    border:1px solid rgba(255,255,255,.7);
+    transition:box-shadow .15s ease;
+  }
+  .sel select{border:none;outline:none;background:transparent;font:inherit;font-weight:700;color:var(--navy);cursor:pointer;font-size:.85rem}
+  .caret{display:inline-block;width:0;height:0;border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--navy);opacity:.7}
+
+  .two{display:flex;gap:8px}
+  .two>.form-row{flex:1;min-width:0}
+  .two .pill{flex:1}
+
+  .btn-calc{
+    margin-top:6px;margin-left:auto;
+    display:inline-flex;align-items:center;justify-content:center;gap:8px;
+    background:linear-gradient(180deg,#B45F06 0%, #8F4D04 100%);
+    color:#fff;font-weight:900;letter-spacing:.6px;font-size:.92rem;
+    border:none;border-radius:999px;
+    padding:13px 30px;cursor:pointer;
+    box-shadow:var(--shadow-btn);
+    transition:transform .12s ease, box-shadow .12s ease;
+  }
+  .btn-calc:hover{transform:translateY(-1px);box-shadow:0 6px 14px rgba(232,137,12,.5)}
+  .btn-calc:active{transform:translateY(0)}
+
+  /* RESULT PANEL */
+  .result{
+    margin-top:18px;background:rgba(255,255,255,.65);
+    border-radius:16px;padding:16px 18px;display:none;
+    border:1px solid rgba(255,255,255,.6);
+  }
+  .result.show{display:block;animation:pop .25s ease}
+  @keyframes pop{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .result h3{font-size:.82rem;color:var(--navy);font-weight:800;letter-spacing:.4px;margin-bottom:10px;text-transform:uppercase}
+  .result-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .result-item{background:#fff;border-radius:12px;padding:10px 12px;box-shadow:0 2px 6px rgba(0,0,0,.06)}
+  .result-item .lbl{font-size:.7rem;color:var(--navy-soft);font-weight:700}
+  .result-item .val{font-size:1.02rem;color:var(--navy);font-weight:900;margin-top:2px;word-break:break-word}
+  .result-item.highlight{
+    background:linear-gradient(135deg,#B45F06,#8F4D04);
+  }
+  .result-item.highlight .lbl{color:rgba(255,255,255,.95)}
+  .result-item.highlight .val{color:#fff}
+
+  /* HISTORY */
+  .history-wrap{
+    width:100%;max-width:920px;margin-top:22px;z-index:1;
+    background:rgba(255,255,255,.96);
+    border-radius:var(--radius-card);
+    box-shadow:var(--shadow-card);
+    padding:20px 22px;display:none;
+    flex-shrink:0;
+  }
+  .history-wrap.show{display:block}
+  .hist-head{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+  .hist-head h2{font-size:1rem;color:var(--navy);font-weight:900}
+  .hist-head .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .hist-bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+  .hist-bar .pill{flex:1;min-width:160px;background:#F7FAFD;border-color:#E2ECF5;box-shadow:none}
+  .hist-bar .pill input{font-weight:600;font-size:.85rem}
+  .hist-bar .sel{background:#F7FAFD;border-color:#E2ECF5;box-shadow:none}
+  .hist-count{font-size:.78rem;color:var(--navy-soft);font-weight:700}
+  .btn-mini{
+    border:1px solid var(--gray-line);background:#fff;color:var(--navy);
+    font:inherit;font-weight:800;font-size:.75rem;
+    padding:7px 12px;border-radius:999px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:5px;
+  }
+  .btn-mini:hover{background:var(--cream)}
+  .btn-mini.danger{color:#c0392b}
+  .empty-hint{color:var(--navy-soft);font-size:.85rem;font-style:italic}
+  table{width:100%;border-collapse:collapse;font-size:.82rem}
+  thead th{
+    text-align:left;color:var(--navy-soft);font-weight:800;font-size:.72rem;
+    text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:2px solid var(--gray-line);
+  }
+  tbody td{padding:9px 10px;border-bottom:1px solid var(--gray-line);color:var(--navy);font-weight:600;vertical-align:top}
+  tbody tr:last-child td{border-bottom:none}
+  .tag{display:inline-block;padding:2px 8px;border-radius:999px;font-size:.68rem;font-weight:800;background:var(--cream);color:var(--navy)}
+  .tag.mfg{background:#dbeafe;color:#1e40af}
+  .tag.trd{background:#dcfce7;color:#166534}
+  .tag.svc{background:#fae8ff;color:#86198f}
+  .scroll-x{overflow-x:auto}
+
+
+
+  .note{font-size:.7rem;color:var(--navy-soft);margin-top:10px;line-height:1.5}
+  .note b{color:var(--navy)}
+
+  /* NAVBAR */
+  .nav{
+    position:sticky;top:0;z-index:50;
+    width:100%;max-width:920px;margin:0 auto 18px;
+    background:rgba(20,28,46,.92);backdrop-filter:blur(10px);
+    border-radius:999px;padding:8px 8px 8px 18px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    border:1px solid rgba(255,255,255,.08);
+    flex-shrink:0;
+  }
+  .nav-brand{color:#fff;font-weight:900;font-size:.95rem;letter-spacing:.3px;display:flex;align-items:center;gap:6px;white-space:nowrap}
+  .nav-brand .dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:linear-gradient(135deg,var(--orange-1),var(--orange-2));box-shadow:0 0 8px rgba(247,183,51,.6)}
+  .nav-links{display:flex;gap:4px;flex-wrap:nowrap}
+  .nav-link{
+    color:rgba(255,255,255,.78);font-weight:800;font-size:.82rem;
+    padding:8px 14px;border-radius:999px;cursor:pointer;
+    background:transparent;border:none;font-family:inherit;
+    transition:.18s ease;white-space:nowrap;
+  }
+  .nav-link:hover{color:#fff;background:rgba(255,255,255,.10)}
+  .nav-link.active{background:linear-gradient(135deg,#B45F06,#8F4D04);color:#fff;box-shadow:0 4px 10px rgba(180,95,6,.4)}
+  .nav-toggle{display:none;background:transparent;border:none;color:#fff;font-size:1.4rem;cursor:pointer;padding:4px 10px}
+
+  /* SECTION anchor offset so sticky nav doesn't cover titles */
+  .section-anchor{scroll-margin-top:84px}
+
+  /* GUIDE CARD */
+  .guide{
+    width:100%;max-width:920px;margin-top:22px;z-index:1;
+    background:#fff;border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+    overflow:hidden;flex-shrink:0;
+  }
+  .guide-head{
+    background:linear-gradient(135deg,#1E3A5F 0%, #3a5478 100%);
+    color:#fff;padding:18px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .guide-head .ico{font-size:1.6rem;line-height:1}
+  .guide-head h2{font-size:1.1rem;font-weight:900;letter-spacing:.2px}
+  .guide-head p{font-size:.78rem;opacity:.92;font-weight:600;margin-top:2px}
+  .guide-body{padding:22px 24px}
+  .guide-step{
+    display:flex;gap:14px;margin-bottom:18px;align-items:flex-start;
+  }
+  .guide-step .num{
+    flex:0 0 34px;width:34px;height:34px;border-radius:50%;
+    background:linear-gradient(135deg,#B45F06,#8F4D04);
+    color:#fff;font-weight:900;display:flex;align-items:center;justify-content:center;font-size:.95rem;
+    box-shadow:0 4px 10px rgba(232,137,12,.35);
+  }
+  .guide-step .txt{flex:1;min-width:0}
+  .guide-step .txt h4{font-size:.92rem;color:var(--navy);font-weight:900;margin-bottom:4px}
+  .guide-step .txt p{font-size:.82rem;color:var(--navy-soft);font-weight:600;line-height:1.55}
+  .guide-step .txt p b{color:var(--navy)}
+  .guide-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:6px;border-radius:10px;overflow:hidden}
+  .guide-table th{background:var(--cream);color:var(--navy);font-weight:800;font-size:.74rem;text-transform:uppercase;letter-spacing:.3px;padding:9px 11px;text-align:left;border-bottom:2px solid var(--gray-line)}
+  .guide-table td{padding:9px 11px;border-bottom:1px solid var(--gray-line);color:var(--navy);font-weight:600;vertical-align:top}
+  .guide-table td:first-child{font-weight:800;color:#B45F06;white-space:nowrap}
+  .guide-table tr:last-child td{border-bottom:none}
+  .guide-sub{font-size:.95rem;color:var(--navy);font-weight:900;margin:18px 0 8px;display:flex;align-items:center;gap:6px}
+
+  /* FOOTER (CTA + social) */
+  .foot{
+    width:100%;max-width:920px;margin-top:26px;z-index:1;
+    border-radius:var(--radius-card);overflow:hidden;box-shadow:var(--shadow-card);
+    flex-shrink:0;
+  }
+  .foot-cta{
+    background:linear-gradient(135deg,#B45F06 0%, #8F4D04 100%);
+    color:#fff;padding:26px 24px;text-align:center;
+  }
+  .foot-cta h3{font-size:clamp(1.15rem,3vw,1.5rem);font-weight:900;letter-spacing:.2px}
+  .foot-cta p{font-size:.85rem;opacity:.95;font-weight:600;margin-top:6px;line-height:1.5}
+  .foot-cta .wa-btn{
+    display:inline-flex;align-items:center;gap:8px;margin-top:14px;
+    background:#fff;color:#B45F06;font-weight:900;font-size:.92rem;
+    padding:13px 26px;border-radius:999px;text-decoration:none;
+    box-shadow:0 6px 16px rgba(0,0,0,.18);transition:transform .12s ease;
+  }
+  .foot-cta .wa-btn:hover{transform:translateY(-1px)}
+  .foot-grid{
+    background:#fff;display:grid;grid-template-columns:1fr 1fr;gap:0;
+  }
+  .foot-cell{padding:22px 24px;display:flex;flex-direction:column;gap:8px}
+  .foot-cell.qris{align-items:center;text-align:center;border-right:1px solid var(--gray-line)}
+  .foot-cell h4{font-size:.95rem;color:var(--navy);font-weight:900;display:flex;align-items:center;gap:6px}
+  .foot-cell p{font-size:.78rem;color:var(--navy-soft);font-weight:600;line-height:1.5}
+  .foot-cell .qris-img{width:140px;height:auto;border-radius:12px;border:1px solid var(--gray-line);box-shadow:0 4px 10px rgba(0,0,0,.10)}
+  .foot-cell .soc-link{display:inline-flex;align-items:center;gap:8px;color:var(--navy);font-weight:800;font-size:.85rem;text-decoration:none;padding:8px 0;border-bottom:1px solid var(--gray-line)}
+  .foot-cell .soc-link:last-child{border-bottom:none}
+  .foot-cell .soc-link:hover{color:#B45F06}
+  .foot-cell .soc-link .si{font-size:1.1rem}
+  .foot-bottom{
+    background:#11192b;color:rgba(255,255,255,.6);padding:14px 24px;text-align:center;
+    font-size:.74rem;font-weight:600;
+  }
+  .foot-bottom b{color:rgba(255,255,255,.85)}
+
+  @media (max-width:760px){
+    .nav{padding:8px 8px 8px 14px;border-radius:22px;flex-wrap:wrap}
+    .nav-toggle{display:inline-flex}
+    .nav-links{
+      display:none;flex-direction:column;width:100%;gap:4px;margin-top:8px;
+      background:rgba(20,28,46,.98);padding:6px;border-radius:16px;
+    }
+    .nav-links.open{display:flex}
+    .nav-link{width:100%;text-align:left;padding:11px 14px}
+    .foot-grid{grid-template-columns:1fr}
+    .foot-cell.qris{border-right:none;border-bottom:1px solid var(--gray-line)}
+  }
+
+  /* PLANNER CARD (target omset) */
+  .planner{
+    width:100%;max-width:920px;margin-top:22px;z-index:1;
+    background:#fff;border-radius:var(--radius-card);box-shadow:var(--shadow-card);
+    overflow:hidden;flex-shrink:0;
+  }
+  .planner-head{
+    background:linear-gradient(135deg,#B45F06 0%, #8F4D04 100%);
+    color:#fff;padding:18px 24px;display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+  }
+  .planner-head .ico{font-size:1.6rem;line-height:1}
+  .planner-head h2{font-size:1.1rem;font-weight:900;letter-spacing:.2px}
+  .planner-head p{font-size:.78rem;opacity:.92;font-weight:600;margin-top:2px}
+  .planner-body{padding:22px 24px}
+  .planner-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+  .planner-body .form-row{margin-bottom:13px}
+  .planner-body .form-row label{color:var(--navy)}
+  .planner-body .pill{background:#F7FAFD;border-color:#E2ECF5;box-shadow:none}
+  .planner-body .pill input,.planner-body .pill select{color:var(--navy)}
+  .planner-body .sel{background:#F7FAFD;border-color:#E2ECF5;box-shadow:none}
+  .btn-ghost{
+    border:1px solid var(--gray-line);background:#fff;color:var(--navy);
+    font:inherit;font-weight:800;font-size:.85rem;
+    padding:13px 22px;border-radius:999px;cursor:pointer;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn-ghost:hover{background:var(--cream)}
+  .btn-ghost:active{transform:translateY(1px)}
+  .btn-save{
+    border:1px solid #E8890C;background:#fff;color:#B45F06;
+    font:inherit;font-weight:900;font-size:.85rem;
+    padding:13px 22px;border-radius:999px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn-save:hover{background:#FFF6E6}
+  .btn-save:active{transform:translateY(1px)}
+  .btn-share{
+    border:1px solid #25D366;background:#fff;color:#128C4A;
+    font:inherit;font-weight:900;font-size:.82rem;
+    padding:10px 16px;border-radius:999px;cursor:pointer;
+    display:inline-flex;align-items:center;gap:6px;
+    transition:transform .12s ease, background .15s ease;
+  }
+  .btn-share:hover{background:#E8FBEE}
+  .btn-share:active{transform:translateY(1px)}
+
+  .action-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:10px}
+  .action-row .btn-calc{margin-left:0}
+
+  /* Validation toast variant */
+  .toast.warn{background:#c0392b}
+  .toast.ok{background:#1E7A3D}
+
+  .plan-result{
+    margin-top:18px;display:none;
+    background:linear-gradient(135deg,#FFF6E6 0%, #FFEFD2 100%);
+    border:1px solid #FBE0B0;border-radius:16px;padding:18px;
+  }
+  .plan-result.show{display:block;animation:pop .25s ease}
+  .plan-result h3{font-size:.82rem;color:#B45F06;font-weight:900;letter-spacing:.4px;margin-bottom:12px;text-transform:uppercase;display:flex;align-items:center;gap:6px}
+  .plan-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .plan-item{background:#fff;border-radius:12px;padding:11px 12px;box-shadow:0 2px 6px rgba(232,137,12,.10)}
+  .plan-item .lbl{font-size:.68rem;color:var(--navy-soft);font-weight:800;text-transform:uppercase;letter-spacing:.3px}
+  .plan-item .val{font-size:1.04rem;color:var(--navy);font-weight:900;margin-top:3px;word-break:break-word}
+  .plan-item.hl{background:linear-gradient(135deg,#B45F06,#8F4D04)}
+  .plan-item.hl .lbl,.plan-item.hl .val{color:#fff}
+  .plan-item .sub{font-size:.66rem;color:var(--navy-soft);font-weight:700;margin-top:2px}
+  .plan-item.hl .sub{color:#fff}
+  .plan-note{font-size:.74rem;color:var(--navy-soft);margin-top:12px;line-height:1.55}
+  .plan-note b{color:var(--navy)}
+
+  .plan-history{margin-top:14px}
+  .plan-history h4{font-size:.78rem;color:var(--navy);font-weight:900;margin-bottom:8px}
+  .plan-list{display:flex;flex-direction:column;gap:8px}
+  .plan-row{
+    background:#F7FAFD;border:1px solid #E2ECF5;border-radius:12px;padding:10px 12px;
+    font-size:.78rem;color:var(--navy);font-weight:600;
+    display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .plan-row .pmeta{display:flex;flex-direction:column;gap:2px}
+  .plan-row .pmeta small{color:var(--navy-soft);font-weight:700;font-size:.7rem}
+  .plan-row .pvals{display:flex;gap:10px;flex-wrap:wrap;text-align:right}
+  .plan-row .pvals b{color:#B45F06}
+  .plan-row .del{background:transparent;border:none;color:#c0392b;cursor:pointer;font-size:1rem;font-weight:800;padding:2px 6px}
+  .plan-empty{color:var(--navy-soft);font-size:.8rem;font-style:italic}
+
+  @media (max-width:760px){
+    .planner-grid{grid-template-columns:1fr}
+    .plan-grid{grid-template-columns:1fr}
+  }
+
+  /* Toast */
+  .toast{
+    position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+    width:max-content;max-width:min(92vw,440px);text-align:center;
+    background:#1E3A5F;color:#fff;padding:11px 18px;border-radius:16px;line-height:1.4;
+    font-weight:700;font-size:.82rem;box-shadow:0 8px 24px rgba(0,0,0,.3);
+    opacity:0;pointer-events:none;transition:.25s ease;z-index:99;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  /* Responsive */
+  @media (max-width:760px){
+    .app{grid-template-columns:1fr;max-width:520px}
+    .card-white{margin-right:0;margin-bottom:0;padding-bottom:18px;order:2}
+    .card-blue{order:1}
+    .illu{display:none}
+    .result-grid{grid-template-columns:1fr}
+    .btn-calc{width:100%}
+    .two{flex-direction:column}
+    /* iOS anti-zoom: input/select font >=16px */
+    .pill input,.pill select,.sel select,.planner-grid input,.planner-grid select,.hist-bar .pill input{font-size:16px}
+  }
+  @media (max-width:420px){
+    body{padding:14px 10px}
+    .card-blue{padding:22px 18px}
+    .card-white{padding:24px 20px 16px}
+  }
+</style>
+</head>
+<body>
+<div class="backdrop"></div>
+
+<!-- NAVBAR -->
+<nav class="nav" id="nav">
+  <div class="nav-brand"><span class="dot"></span>Kalkulator HPP</div>
+  <button class="nav-toggle" id="navToggle" aria-label="Menu">☰</button>
+  <div class="nav-links" id="navLinks">
+    <button class="nav-link" data-target="app">HPP</button>
+    <button class="nav-link" data-target="planner">Perencanaan</button>
+    <button class="nav-link" data-target="guide">Panduan</button>
+    <button class="nav-link" data-target="historyWrap">Riwayat</button>
+  </div>
+</nav>
+
+<div class="app section-anchor" id="app">
+  <!-- WHITE CARD -->
+  <div class="card-white">
+    <h1 class="title">
+      <span class="accent">Kalkulator HPP</span>
+      <span class="main">Harga Pokok Penjualan</span>
+    </h1>
+    <div class="subtitle">Hitung HPP per unit, harga jual, margin, BEP &amp; fee marketplace untuk produk manufaktur, dagang, atau jasa. Klik 💾 Simpan untuk menyimpan hasil — data tersimpan di perangkat Anda.</div>
+
+    <div class="illu" aria-hidden="true">
+      <!-- SVG illustration: calculator + coins -->
+      <svg viewBox="0 0 260 240" xmlns="http://www.w3.org/2000/svg">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#3EC9E8" stop-opacity="0.85"/>
+            <stop offset="100%" stop-color="#3EC9E8" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="calcBody" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5BB0E6"/>
+            <stop offset="100%" stop-color="#3B82C4"/>
+          </linearGradient>
+          <linearGradient id="coinG" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#F7B733"/>
+            <stop offset="100%" stop-color="#E8890C"/>
+          </linearGradient>
+          <linearGradient id="screen" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#BFEAFF"/>
+            <stop offset="100%" stop-color="#8FCFF0"/>
+          </linearGradient>
+        </defs>
+        <circle cx="130" cy="120" r="98" fill="url(#glow)"/>
+        <!-- coins -->
+        <g transform="translate(28 150) rotate(-12)">
+          <ellipse cx="22" cy="8" rx="22" ry="8" fill="#E8890C"/>
+          <rect x="0" y="0" width="44" height="8" fill="url(#coinG)"/>
+          <ellipse cx="22" cy="0" rx="22" ry="8" fill="url(#coinG)"/>
+          <text x="22" y="3.4" font-family="Nunito,Arial" font-weight="900" font-size="9" fill="#7a4a00" text-anchor="middle">$</text>
+        </g>
+        <g transform="translate(40 120) rotate(8)">
+          <ellipse cx="20" cy="7" rx="20" ry="7" fill="#E8890C"/>
+          <rect x="0" y="0" width="40" height="7" fill="url(#coinG)"/>
+          <ellipse cx="20" cy="0" rx="20" ry="7" fill="url(#coinG)"/>
+          <text x="20" y="3" font-family="Nunito,Arial" font-weight="900" font-size="8" fill="#7a4a00" text-anchor="middle">$</text>
+        </g>
+        <g transform="translate(196 170) rotate(15)">
+          <ellipse cx="22" cy="8" rx="22" ry="8" fill="#E8890C"/>
+          <rect x="0" y="0" width="44" height="8" fill="url(#coinG)"/>
+          <ellipse cx="22" cy="0" rx="22" ry="8" fill="url(#coinG)"/>
+          <text x="22" y="3.4" font-family="Nunito,Arial" font-weight="900" font-size="9" fill="#7a4a00" text-anchor="middle">$</text>
+        </g>
+        <!-- calculator body -->
+        <g transform="translate(86 50) rotate(-14 44 100)">
+          <rect x="0" y="0" width="88" height="150" rx="14" fill="url(#calcBody)"/>
+          <rect x="0" y="0" width="88" height="150" rx="14" fill="none" stroke="#2c6aa0" stroke-width="1.5" opacity=".5"/>
+          <!-- screen -->
+          <rect x="10" y="12" width="68" height="34" rx="6" fill="url(#screen)"/>
+          <text x="74" y="34" font-family="Nunito,Arial" font-weight="900" font-size="11" fill="#1E3A5F" text-anchor="end">Rp 0</text>
+          <!-- buttons grid -->
+          <g fill="#fff">
+            <rect x="12" y="56" width="16" height="14" rx="3"/>
+            <rect x="36" y="56" width="16" height="14" rx="3"/>
+            <rect x="60" y="56" width="16" height="14" rx="3" fill="#F7B733"/>
+            <rect x="12" y="76" width="16" height="14" rx="3"/>
+            <rect x="36" y="76" width="16" height="14" rx="3"/>
+            <rect x="60" y="76" width="16" height="14" rx="3" fill="#F7B733"/>
+            <rect x="12" y="96" width="16" height="14" rx="3"/>
+            <rect x="36" y="96" width="16" height="14" rx="3"/>
+            <rect x="60" y="96" width="16" height="14" rx="3" fill="#F7B733"/>
+            <rect x="12" y="116" width="64" height="20" rx="4" fill="#E8890C"/>
+          </g>
+        </g>
+      </svg>
+    </div>
+
+    <div class="chips">
+      <span class="chip">📊 3 Mode</span>
+      <span class="chip">💾 Tersimpan Lokal</span>
+      <span class="chip">🎯 BEP &amp; Fee Marketplace</span>
+      <span class="chip">🇮🇩 Format Rupiah</span>
+    </div>
+  </div>
+
+  <!-- BLUE CARD -->
+  <div class="card-blue">
+    <div class="form-row">
+      <label for="mode">Mode Kalkulator</label>
+      <div class="field">
+        <div class="pill">
+          <select id="mode" aria-label="Pilih mode kalkulator">
+            <option value="mfg">Produksi / Manufaktur (per unit)</option>
+            <option value="trd">Produk Dagang (per unit)</option>
+            <option value="svc">Jasa / Proyek</option>
+          </select>
+          <span class="caret"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Manufacturing fields -->
+    <div id="fields-mfg" class="mode-fields">
+      <div class="form-row">
+        <label for="mfg_name">Nama Produk</label>
+        <div class="field"><div class="pill"><input type="text" id="mfg_name" placeholder="cth: Kemeja Cotton"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_units">Jumlah Unit Produksi</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="mfg_units" inputmode="decimal" placeholder="0" value="100"><span class="suffix">unit</span></div></div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_mat">Biaya Bahan Baku (total)</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="mfg_mat" inputmode="numeric" placeholder="0" value="5.000.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_lab">Biaya Tenaga Kerja Langsung</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="mfg_lab" inputmode="numeric" placeholder="0" value="2.000.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_oh">Biaya Overhead Pabrik</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="mfg_oh" inputmode="numeric" placeholder="0" value="1.500.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_fee">Fee Marketplace / Payment (opsional)</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="mfg_fee" inputmode="decimal" placeholder="0" value="0"><span class="suffix">%</span></div></div>
+      </div>
+      <div class="two">
+        <div class="form-row">
+          <label for="mfg_disc">Diskon (opsional)</label>
+          <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="mfg_disc" inputmode="decimal" placeholder="0" value="0"><span class="suffix">%</span></div></div>
+        </div>
+        <div class="form-row">
+          <label for="mfg_pack">Biaya Kemasan/unit</label>
+          <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="mfg_pack" inputmode="numeric" placeholder="0" value="0"></div></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="mfg_margin">Margin Keuntungan</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-dec" id="mfg_margin" inputmode="decimal" placeholder="0" value="30"><span class="suffix">%</span></div>
+          <div class="sel"><select id="mfg_marginBase"><option value="cost">dari HPP</option><option value="sales">dari harga jual</option></select><span class="caret"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trading fields -->
+    <div id="fields-trd" class="mode-fields" style="display:none">
+      <div class="form-row">
+        <label for="trd_name">Nama Produk</label>
+        <div class="field"><div class="pill"><input type="text" id="trd_name" placeholder="cth: Sepatu Sneaker"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="trd_units">Jumlah Unit Pembelian</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="trd_units" inputmode="decimal" placeholder="0" value="50"><span class="suffix">unit</span></div></div>
+      </div>
+      <div class="form-row">
+        <label for="trd_buy">Harga Beli Total</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="trd_buy" inputmode="numeric" placeholder="0" value="7.500.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="trd_freight">Biaya Angkut &amp; Asuransi</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="trd_freight" inputmode="numeric" placeholder="0" value="300.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="trd_storage">Biaya Penyimpanan &amp; Lainnya</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="trd_storage" inputmode="numeric" placeholder="0" value="200.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="trd_fee">Fee Marketplace / Payment (opsional)</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="trd_fee" inputmode="decimal" placeholder="0" value="0"><span class="suffix">%</span></div></div>
+      </div>
+      <div class="two">
+        <div class="form-row">
+          <label for="trd_disc">Diskon (opsional)</label>
+          <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="trd_disc" inputmode="decimal" placeholder="0" value="0"><span class="suffix">%</span></div></div>
+        </div>
+        <div class="form-row">
+          <label for="trd_pack">Biaya Kemasan/unit</label>
+          <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="trd_pack" inputmode="numeric" placeholder="0" value="0"></div></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="trd_margin">Margin Keuntungan</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-dec" id="trd_margin" inputmode="decimal" placeholder="0" value="25"><span class="suffix">%</span></div>
+          <div class="sel"><select id="trd_marginBase"><option value="cost">dari HPP</option><option value="sales">dari harga jual</option></select><span class="caret"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service fields -->
+    <div id="fields-svc" class="mode-fields" style="display:none">
+      <div class="form-row">
+        <label for="svc_name">Nama Proyek/Jasa</label>
+        <div class="field"><div class="pill"><input type="text" id="svc_name" placeholder="cth: Jasa Desain Logo"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_lab">Biaya Tenaga Kerja</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="svc_lab" inputmode="numeric" placeholder="0" value="1.500.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_mat">Biaya Material/Bahan Pendukung</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="svc_mat" inputmode="numeric" placeholder="0" value="300.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_oh">Biaya Operasional &amp; Overhead</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="svc_oh" inputmode="numeric" placeholder="0" value="400.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_units">Jumlah Unit/Pengerjaan</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="svc_units" inputmode="decimal" placeholder="1" value="1"><span class="suffix">unit</span></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_fee">Fee Marketplace / Payment (opsional)</label>
+        <div class="field"><div class="pill"><input type="text" class="fmt-dec" id="svc_fee" inputmode="decimal" placeholder="0" value="0"><span class="suffix">%</span></div></div>
+      </div>
+      <div class="form-row">
+        <label for="svc_margin">Margin Keuntungan</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-dec" id="svc_margin" inputmode="decimal" placeholder="0" value="40"><span class="suffix">%</span></div>
+          <div class="sel"><select id="svc_marginBase"><option value="cost">dari HPP</option><option value="sales">dari harga jual</option></select><span class="caret"></span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-calc" id="btnCalc" type="button">HITUNG HPP ➜</button>
+      <button class="btn-save" id="btnSaveHpp" type="button" title="Simpan hasil ini ke Riwayat">💾 Simpan</button>
+      <button class="btn-ghost" id="btnTargetPrice" type="button" title="Hitung harga jual agar margin bersih tercapai (setelah diskon & fee)">🎯 Harga Target</button>
+      <button class="btn-share" id="btnShareHpp" type="button" title="Bagikan hasil via WhatsApp">💬 Bagikan</button>
+    </div>
+
+    <div class="result" id="result" aria-live="polite">
+      <h3>Hasil Perhitungan</h3>
+      <div class="result-grid">
+        <div class="result-item highlight">
+          <div class="lbl">HPP per Unit</div>
+          <div class="val" id="r_hppunit">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Total HPP</div>
+          <div class="val" id="r_hpptotal">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Harga Jual Disarankan</div>
+          <div class="val" id="r_price">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Keuntungan per Unit</div>
+          <div class="val" id="r_profit">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Harga Setelah Diskon &amp; Fee</div>
+          <div class="val" id="r_netprice">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Keuntungan Bersih per Unit</div>
+          <div class="val" id="r_netprofit">Rp 0</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">Margin Bersih (dari harga jual)</div>
+          <div class="val" id="r_netmargin">0%</div>
+        </div>
+        <div class="result-item">
+          <div class="lbl">BEP (Break Even Unit)</div>
+          <div class="val" id="r_bep">0</div>
+        </div>
+      </div>
+      <div class="note" id="r_note"></div>
+    </div>
+  </div>
+</div>
+
+<!-- PLANNER: Target Omset -->
+<div class="planner section-anchor" id="planner">
+  <div class="planner-head">
+    <span class="ico">🎯</span>
+    <div>
+      <h2>Perencanaan Target Omset</h2>
+      <p>Tetapkan target omset &amp; periode — sistem hitung omset harian, profit, dan berapa unit harus terjual.</p>
+    </div>
+  </div>
+  <div class="planner-body">
+    <div class="planner-grid">
+      <div class="form-row">
+        <label for="pl_name">Nama Produk / Usaha</label>
+        <div class="field"><div class="pill"><input type="text" id="pl_name" placeholder="cth: Kemeja Cotton"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="pl_target">Target Omset Total</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="pl_target" inputmode="numeric" placeholder="0" value="2.500.000"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="pl_dur">Periode Pencapaian</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-int" id="pl_dur" inputmode="numeric" placeholder="1" value="3"></div>
+          <div class="sel"><select id="pl_unit"><option value="day">Hari</option><option value="week">Minggu</option><option value="month" selected>Bulan</option><option value="year">Tahun</option></select><span class="caret"></span></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="pl_workdays">Hari Operasional / Minggu</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-int" id="pl_workdays" inputmode="numeric" placeholder="6" value="6"><span class="suffix">hari/mgg</span></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="pl_holiday">Hari Libur dalam Periode (opsional)</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-int" id="pl_holiday" inputmode="numeric" placeholder="0" value="0"><span class="suffix">hari</span></div>
+        </div>
+      </div>
+      <div class="form-row">
+        <label for="pl_hpp">HPP per Unit (auto dari HPP)</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="pl_hpp" inputmode="numeric" placeholder="0" value="0"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="pl_price">Harga Jual per Unit</label>
+        <div class="field"><div class="pill"><span class="pfx">Rp</span><input type="text" class="fmt-rp" id="pl_price" inputmode="numeric" placeholder="0" value="110.500"></div></div>
+      </div>
+      <div class="form-row">
+        <label for="pl_capacity">Kapasitas Produksi / Hari (opsional)</label>
+        <div class="field">
+          <div class="pill"><input type="text" class="fmt-int" id="pl_capacity" inputmode="numeric" placeholder="0" value="0"><span class="suffix">unit/hari</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-calc" id="btnPlan" type="button">HITUNG TARGET ➜</button>
+      <button class="btn-save" id="btnSavePlan" type="button" title="Simpan rencana ini">💾 Simpan</button>
+      <button class="btn-ghost" id="btnPlanAuto" type="button" title="Ambil HPP per unit & harga bersih dari hasil HPP">↻ Pakai Hasil HPP</button>
+      <button class="btn-share" id="btnSharePlan" type="button" title="Bagikan rencana via WhatsApp">💬 Bagikan</button>
+    </div>
+
+    <div class="plan-result" id="planResult" aria-live="polite">
+      <h3>📊 Rencana Pencapaian Target</h3>
+      <div class="plan-grid">
+        <div class="plan-item hl">
+          <div class="lbl">Omset per Hari</div>
+          <div class="val" id="pr_daily">Rp 0</div>
+          <div class="sub" id="pr_dailySub">— per hari kerja</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Omset per Minggu</div>
+          <div class="val" id="pr_weekly">Rp 0</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Omset per Bulan</div>
+          <div class="val" id="pr_monthly">Rp 0</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Profit Total</div>
+          <div class="val" id="pr_profitTotal">Rp 0</div>
+          <div class="sub" id="pr_profitSub">— dari margin</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Profit per Hari</div>
+          <div class="val" id="pr_profitDaily">Rp 0</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Unit Harus Terjual</div>
+          <div class="val" id="pr_units">0</div>
+          <div class="sub" id="pr_unitsSub">— total seluruh periode</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Unit per Hari</div>
+          <div class="val" id="pr_unitsDaily">0</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">HPP per Unit</div>
+          <div class="val" id="pr_hppUnit">Rp 0</div>
+        </div>
+        <div class="plan-item">
+          <div class="lbl">Jumlah Hari Kerja</div>
+          <div class="val" id="pr_workdays">0</div>
+          <div class="sub">hari dalam periode</div>
+        </div>
+      </div>
+      <div class="plan-note" id="pr_note"></div>
+    </div>
+
+    <div class="plan-history">
+      <h4>📒 Rencana Tersimpan <span id="planCount" style="color:var(--navy-soft);font-weight:700"></span>
+        <button class="btn-mini danger" id="btnPlanClear" type="button" style="margin-left:8px;display:none">🗑 Hapus Semua</button>
+      </h4>
+      <div class="plan-list" id="planList"></div>
+      <p class="plan-empty" id="planEmpty">Belum ada rencana tersimpan. Klik <b>HITUNG TARGET</b> lalu <b>💾 Simpan</b> untuk menyimpan di perangkat ini.</p>
+    </div>
+  </div>
+</div>
+
+<!-- GUIDE -->
+<div class="guide section-anchor" id="guide">
+  <div class="guide-head">
+    <span class="ico">📘</span>
+    <div>
+      <h2>Panduan Penggunaan</h2>
+      <p>Cara pakai kalkulator HPP &amp; perencanaan target omset, plus penjelasan tiap isian.</p>
+    </div>
+  </div>
+  <div class="guide-body">
+    <div class="guide-sub">🚀 Langkah-langkah</div>
+
+    <div class="guide-step">
+      <div class="num">1</div>
+      <div class="txt">
+        <h4>Pilih Mode Kalkulator</h4>
+        <p>Pilih <b>Manufaktur</b> (produk yang diproduksi), <b>Dagang</b> (produk yang dibeli untuk dijual lagi), atau <b>Jasa</b> (proyek/jasa). Form isian menyesuaikan mode; hasil sebelumnya disembunyikan saat ganti mode.</p>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">2</div>
+      <div class="txt">
+        <h4>Isi Biaya Produksi &amp; Margin</h4>
+        <p>Masukkan nama produk, jumlah unit, dan rincian biaya (bahan baku, tenaga kerja, overhead, dst). Isi <b>margin keuntungan</b> — pilih dasar <i>dari HPP</i> (markup) atau <i>dari harga jual</i>. Opsional: <b>fee marketplace</b>, <b>diskon</b>, dan <b>biaya kemasan/unit</b> untuk menghitung harga &amp; profit bersih.</p>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">3</div>
+      <div class="txt">
+        <h4>Klik HITUNG HPP</h4>
+        <p>Sistem menghitung HPP per unit, total HPP, harga jual, profit per unit, <b>harga bersih</b> (setelah diskon &amp; fee), <b>margin bersih</b>, dan <b>BEP</b>. Hasil <b>tidak otomatis tersimpan</b> — klik <b>💾 Simpan</b> jika ingin menyimpannya ke Riwayat.</p>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">4</div>
+      <div class="txt">
+        <h4>Bagikan atau Buat Rencana Target</h4>
+        <p>Klik <b>💬 Bagikan</b> untuk mengirim ringkasan hasil via WhatsApp. Untuk merencanakan omset, scroll ke <b>Perencanaan Target Omset</b> lalu klik <b>↻ Pakai Hasil HPP</b> agar HPP per unit &amp; harga jual terisi otomatis dari langkah 3.</p>
+      </div>
+    </div>
+
+    <div class="guide-step">
+      <div class="num">5</div>
+      <div class="txt">
+        <h4>Klik HITUNG TARGET</h4>
+        <p>Isi <b>target omset total</b>, <b>periode</b>, <b>hari operasional/minggu</b>, lalu klik HITUNG TARGET. Sistem menghitung <b>omset per hari/minggu/bulan</b>, <b>profit total &amp; harian</b>, dan <b>berapa unit harus terjual</b>. Klik <b>💾 Simpan</b> untuk menyimpan rencana.</p>
+      </div>
+    </div>
+
+    <div class="guide-sub">🧮 Penjelasan Isian Kalkulator HPP</div>
+    <div class="scroll-x">
+      <table class="guide-table">
+        <thead><tr><th>Isian</th><th>Penjelasan</th></tr></thead>
+        <tbody>
+          <tr><td>Mode Kalkulator</td><td>Jenis usaha: Manufaktur (produksi), Dagang (reseller), atau Jasa. Menentukan komponen biaya yang dihitung.</td></tr>
+          <tr><td>Nama Produk</td><td>Nama barang/jasa untuk catatan riwayat. Contoh: "Kemeja Cotton".</td></tr>
+          <tr><td>Jumlah Unit</td><td>Berapa unit yang diproduksi/dibeli/dikerjakan. Dipakai membagi total biaya jadi HPP per unit. Jika 0, otomatis dianggap 1 (dengan peringatan).</td></tr>
+          <tr><td>Biaya Bahan Baku</td><td>(Manufaktur) Total biaya seluruh bahan baku untuk seluruh unit. Bukan per unit.</td></tr>
+          <tr><td>Biaya Tenaga Kerja</td><td>(Manufaktur/Jasa) Upah pekerja langsung yang terlibat produksi/pengerjaan.</td></tr>
+          <tr><td>Biaya Overhead</td><td>(Manufaktur) Biaya pabrik tidak langsung: listrik, air, penyusutan alat, dll. Diperlakukan sebagai <b>biaya tetap</b> untuk BEP.</td></tr>
+          <tr><td>Harga Beli Total</td><td>(Dagang) Total harga beli seluruh unit dari supplier.</td></tr>
+          <tr><td>Biaya Angkut &amp; Penyimpanan</td><td>(Dagang) Ongkir, asuransi, gudang, dan biaya lain. Diperlakukan sebagai <b>biaya tetap</b> untuk BEP.</td></tr>
+          <tr><td>Fee Marketplace/Payment</td><td>(Opsional) Persentase potongan platform/marketplace/payment gateway, mis. 0,7%. Tidak boleh negatif; ≥100% dibatasi ke 99% (harga bersih jadi nol).</td></tr>
+          <tr><td>Diskon</td><td>(Opsional) Persentase diskon dari harga jual, mis. 10%. Dipakai menghitung <b>harga bersih</b>. ≥100% dibatasi ke 99%.</td></tr>
+          <tr><td>Biaya Kemasan/unit</td><td>(Manufaktur/Dagang) Biaya kemasan per unit, ditambahkan ke HPP per unit.</td></tr>
+          <tr><td>Margin %</td><td>Persentase keuntungan. <b>Dari HPP</b>: harga jual = HPP × (1+margin). <b>Dari harga jual</b>: harga jual = HPP ÷ (1−margin). Tidak boleh negatif.</td></tr>
+          <tr><td>Hasil: Harga Bersih</td><td>Harga jual setelah dikurangi diskon &amp; fee marketplace. Inilah uang yang benar-benar diterima per unit.</td></tr>
+          <tr><td>Hasil: Profit Bersih</td><td>Harga bersih − HPP per unit. Bisa lebih kecil dari profit kotor jika ada diskon/fee.</td></tr>
+          <tr><td>Hasil: BEP (Break Even Unit)</td><td>Jumlah unit minimum agar impas = biaya tetap ÷ (harga bersih − biaya variabel/unit). Tampil <b>—</b> bila biaya tetap Rp 0 (jual 1 unit sudah impas), dan <b>"Tidak tercapai"</b> bila harga bersih lebih kecil dari biaya variabel/unit (setiap unit terjual tetap rugi). Jika BEP melebihi jumlah unit Anda, muncul peringatan agar jual lebih banyak.</td></tr>
+          <tr><td>Tombol 🎯 Harga Target</td><td>Menghitung harga jual yang diperlukan agar margin bersih tercapai setelah diskon &amp; fee. Berguna jika Anda menjual via marketplace dengan potongan.</td></tr>
+          <tr><td>Tombol 💾 Simpan</td><td>Menyimpan hasil saat ini ke Riwayat. Entri identik dengan entri terakhir tidak disimpan ulang.</td></tr>
+          <tr><td>Tombol 💬 Bagikan</td><td>Membuka WhatsApp dengan ringkasan hasil HPP (HPP, harga jual, profit, BEP).</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="guide-sub">🎯 Penjelasan Isian Perencanaan Target</div>
+    <div class="scroll-x">
+      <table class="guide-table">
+        <thead><tr><th>Isian</th><th>Penjelasan</th></tr></thead>
+        <tbody>
+          <tr><td>Nama Produk/Usaha</td><td>Label untuk rencana. Bisa auto-isi dari hasil HPP.</td></tr>
+          <tr><td>Target Omset Total</td><td>Total pendapatan yang ingin dicapai, mis. Rp 2.500.000. Bukan profit — ini total nilai penjualan.</td></tr>
+          <tr><td>Periode Pencapaian</td><td>Jangka waktu mencapai target. Pilih satuan: Hari/Minggu/Bulan/Tahun, lalu isi jumlah (mis. 3 Bulan).</td></tr>
+          <tr><td>Hari Operasional/Minggu</td><td>Berapa hari usaha buka per minggu (1–7). Mis. 6 = buka Senin–Sabtu.</td></tr>
+          <tr><td>Hari Libur dalam Periode</td><td>(Opsional) Hari libur/minggu besar yang mengurangi hari kerja nyata, mis. 5 hari.</td></tr>
+          <tr><td>HPP per Unit</td><td>Harga pokok per unit. Klik <b>↻ Pakai Hasil HPP</b> untuk auto-isi dari hasil kalkulator HPP terakhir.</td></tr>
+          <tr><td>Harga Jual per Unit</td><td>Harga jual 1 unit. "Pakai Hasil HPP" mengisi <b>harga bersih</b> (setelah diskon &amp; fee) agar konsisten dengan profit yang dilihat.</td></tr>
+          <tr><td>Kapasitas Produksi/Hari</td><td>(Opsional) Berapa unit maksimum yang bisa diproduksi/jual per hari. Jika target melebihi ini, muncul peringatan.</td></tr>
+          <tr><td>Tombol ↻ Pakai Hasil HPP</td><td>Auto-isi HPP per unit &amp; harga bersih dari hasil HPP terakhir. Tampil bila Anda sudah klik <b>HITUNG HPP</b>; klik dulu bila belum ada hasil.</td></tr>
+          <tr><td>Tombol 💾 Simpan</td><td>Menyimpan rencana ke daftar "Rencana Tersimpan". Rencana identik tidak disimpan ulang.</td></tr>
+          <tr><td>Tombol 💬 Bagikan</td><td>Membuka WhatsApp dengan ringkasan rencana (omset harian/mingguan/bulanan, profit, unit).</td></tr>
+          <tr><td>Hasil: Omset/Hari</td><td>Target omset ÷ hari kerja nyata (setelah dikurangi hari libur). Inilah target penjualan harian Anda.</td></tr>
+          <tr><td>Hasil: Omset/Minggu &amp; /Bulan</td><td>Dihitung dari omset harian × faktor konversi (mingguan = harian × hari/mgg; bulanan = harian × hari/mgg × 52/12) — konsisten untuk periode apa pun.</td></tr>
+          <tr><td>Hasil: Unit Harus Terjual</td><td>Target omset ÷ harga jual. Dibulatkan ke atas. Tampilkan juga rincian per hari.</td></tr>
+          <tr><td>Hasil: Profit Total</td><td>(Harga jual − HPP per unit) × unit terjual. Bukan dari margin diketik — langsung dari struktur biaya.</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p class="note" style="margin-top:16px">💡 <b>Tips:</b> Pakai tombol <b>↻ Pakai Hasil HPP</b> setelah menghitung HPP agar perencanaan target konsisten dengan struktur biaya produk Anda. Angka omset mingguan/bulanan adalah <b>estimasi</b> (1 bulan = 30 hari, 1 minggu = 7 hari). Semua data tersimpan di perangkat (localStorage) — data perhitungan tidak dikirim ke server mana pun; hanya font Google Fonts yang diambil dari luar (di-cache service worker agar tetap tersedia offline).</p>
+  </div>
+</div>
+
+<!-- HISTORY -->
+<div class="history-wrap section-anchor" id="historyWrap">
+  <div class="hist-head">
+    <h2>📒 Riwayat Perhitungan <span id="histCount" style="font-weight:700;color:var(--navy-soft);font-size:.85rem"></span></h2>
+    <div class="actions">
+      <button class="btn-mini" id="btnExport" type="button">⬇ Export CSV</button>
+      <button class="btn-mini" id="btnBackup" type="button">💾 Backup JSON</button>
+      <button class="btn-mini" id="btnImport" type="button">⬆ Import JSON</button>
+      <input type="file" id="fileImport" accept=".json,application/json" style="display:none">
+      <button class="btn-mini danger" id="btnClear" type="button">🗑 Hapus Semua</button>
+    </div>
+  </div>
+  <div class="hist-bar">
+    <div class="pill"><input type="text" id="histSearch" placeholder="🔍 Cari nama produk..." aria-label="Cari riwayat"></div>
+    <div class="sel"><select id="histFilter" aria-label="Filter mode"><option value="all">Semua Mode</option><option value="mfg">Manufaktur</option><option value="trd">Dagang</option><option value="svc">Jasa</option></select><span class="caret"></span></div>
+    <span class="hist-count" id="histShown"></span>
+  </div>
+  <div class="scroll-x">
+    <table>
+      <thead>
+        <tr>
+          <th>Waktu</th><th>Mode</th><th>Nama</th><th>Unit</th><th>Total HPP</th><th>HPP/Unit</th><th>Harga Jual</th><th>Profit/Unit</th><th>BEP</th><th>Margin</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="histBody"></tbody>
+    </table>
+  </div>
+  <p class="empty-hint" id="emptyHint" style="display:none">Belum ada riwayat. Klik <b>HITUNG HPP</b> lalu <b>💾 Simpan</b> untuk menyimpan hasil di perangkat ini.</p>
+  <div id="undoBar" class="plan-row" style="display:none;margin-top:10px;background:#FFF6E6;border-color:#FBE0B0">
+    <div class="pmeta"><span class="undo-msg" style="color:#c0392b"></span></div>
+    <div class="pvals"><button class="btn-mini undo-btn" type="button" style="background:#B45F06;color:#fff;border-color:#8F4D04">↩ Undo Hapus</button></div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="foot">
+  <div class="foot-cta">
+    <h3>Ingin Aplikasi / Web / Platform Bisnis?</h3>
+    <p>Saya bantu membangun aplikasi, website, atau platform sesuai kebutuhan usaha Anda — kalkulator, dashboard, sistem kasir, katalog, dan lainnya.</p>
+    <a class="wa-btn" href="https://wa.me/6285536362553" target="_blank" rel="noopener">💬 Hubungi: 0855-3636-2553</a>
+  </div>
+  <div class="foot-grid">
+    <div class="foot-cell qris">
+      <h4>☕ Traktir Kopi</h4>
+      <img class="qris-img" src="qris.jpg" width="140" height="210" loading="lazy" decoding="async" alt="QRIS Ratakiri untuk traktir kopi" onerror="this.onerror=null;this.style.display='none';this.parentNode.querySelector('.qris-fallback').style.display='block'">
+      <p class="qris-fallback" style="display:none;font-size:.78rem;color:var(--navy-soft)">📷 File <b>qris.jpg</b> tidak ditemukan. Letakkan di folder yang sama dengan file HTML.</p>
+      <p>Scan QRIS untuk dukung pembuatan tools gratis ini. Terima kasih! 🙏</p>
+    </div>
+    <div class="foot-cell">
+      <h4>🔗 Terhubung</h4>
+      <a class="soc-link" href="https://instagram.com/id.ratakiri" target="_blank" rel="noopener"><span class="si">📸</span> Instagram: @id.ratakiri</a>
+      <a class="soc-link" href="https://ratakiriblog.vercel.app" target="_blank" rel="noopener"><span class="si">📝</span> Blog: ratakiriblog.vercel.app</a>
+      <a class="soc-link" href="https://wa.me/6285536362553" target="_blank" rel="noopener"><span class="si">💬</span> WhatsApp: 0855-3636-2553</a>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    Dibuat oleh <b>Ratakiri</b> • Kalkulator HPP &amp; Perencanaan Target Omset • Data tersimpan di perangkat Anda
+  </div>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){return document.getElementById(id)};
+  var STORAGE_KEY = "kalkulator_hpp_history_v2";
+  var STORAGE_KEY_OLD = "kalkulator_hpp_history_v1";
+  var DRAFT_HPP = "kalkulator_hpp_draft_hpp_v1";
+  var PLAN_KEY = "kalkulator_hpp_plans_v2";
+  var PLAN_LAST = "kalkulator_hpp_plan_last_v1";
+  var mode = "mfg";
+  var lastHppResult = null;     // hasil HPP terakhir (HITUNG / Harga Target)
+  var hppDirty = true;          // true = input berubah, hasil layar mungkin basi
+  var undoStack = [];           // entri yang baru dihapus (untuk Undo)
+  var MODE_LABEL = {mfg:"Manufaktur", trd:"Dagang", svc:"Jasa"};
+  var UNIT_LABEL = {day:"hari",week:"minggu",month:"bulan",year:"tahun"};
+  var UNIT_SHORT = {day:"hari",week:"mgg",month:"bln",year:"thn"};
+
+  /* ---------- Helpers ---------- */
+  // parse angka dari input teks berformat.
+  // - fmt-dec (margin/fee/diskon): titik = desimal kecuali ada koma (id-ID).
+  //   "2.5" -> 2.5 ; "12,5" -> 12.5 ; "1.250,75" -> 1250.75
+  //   Pengecualian untuk kolom unit (id berakhiran _units): orang Indonesia sering mengetik
+  //   "1.000" berarti 1000. Pola ketat /^[1-9]\d{0,2}(\.\d{3})+$/ (ribuan) -> buang titik.
+  //   "0.5" / "2.5" tidak terpengaruh karena tidak cocok pola ribuan.
+  // - fmt-rp/fmt-int (rupiah/unit): titik = pemisah ribuan, dibuang.
+  function num(id){
+    var el = $(id);
+    var v = String(el && el.value != null ? el.value : "").trim();
+    if(v==="") return 0;
+    var cls = el ? (el.className||"") : "";
+    if(cls.indexOf("fmt-dec")>=0){
+      if(v.indexOf(",")>=0) v = v.replace(/\./g,"").replace(",",".");
+      else if(/_units$/.test(id) && /^[1-9]\d{0,2}(\.\d{3})+$/.test(v)) v = v.replace(/\./g,"");
+      // titik sebagai desimal: ambil digit, koma/minus diizinkan
+      v = v.replace(/[^0-9.\-]/g,"");
+    } else {
+      // fmt-rp/fmt-int: abaikan semua non-digit (titik ribuan, koma, spasi) — anti WebView lama
+      v = v.replace(/[^\d\-]/g,"");
+    }
+    var n = parseFloat(v);
+    return isFinite(n) ? n : 0;
+  }
+  // parse persen non-negatif untuk margin/fee/diskon
+  function numPct(id){
+    return Math.max(0, num(id));
+  }
+  // formatter sendiri (anti perangkat tanpa data locale id-ID: sebagian WebView Android lama
+  // menghasilkan "5,000,000" dari toLocaleString("id-ID"), lalu num() salah baca).
+  function fmtInt(n){
+    if(!isFinite(n)) n=0;
+    return String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,".");
+  }
+  function fmt(n){ return "Rp "+fmtInt(n); }
+  function fmtPct(n){
+    if(!isFinite(n)) n=0;
+    return Number(n).toFixed(2).replace(".",",")+"%";
+  }
+  function pct(n){ return fmtPct(n); }
+  function toast(msg, kind){
+    var t=$("toast");
+    t.textContent=msg;
+    t.classList.remove("warn","ok");
+    if(kind==="warn") t.classList.add("warn");
+    else if(kind==="ok") t.classList.add("ok");
+    t.classList.add("show");
+    clearTimeout(t._t); t._t=setTimeout(function(){t.classList.remove("show")},2600);
+  }
+  function escapeHtml(s){
+    return String(s==null?"":s).replace(/[&<>"']/g,function(c){
+      return {"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c];
+    });
+  }
+  function pad2(n){return n<10?"0"+n:""+n}
+  function stampOf(d){
+    return pad2(d.getDate())+"/"+pad2(d.getMonth()+1)+"/"+d.getFullYear()+" "+pad2(d.getHours())+":"+pad2(d.getMinutes());
+  }
+  function nowStamp(){ return stampOf(new Date()); }
+  function unitLabel(unit, dur){
+    return dur+" "+(UNIT_LABEL[unit]||unit);
+  }
+
+  /* ---------- Number formatting on input ---------- */
+  // format ribuan untuk fmt-rp & fmt-int (caret dipertahankan); fmt-dec tidak diformat.
+  function formatField(el){
+    if(!el) return;
+    var cls = el.className||"";
+    if(cls.indexOf("fmt-dec")>=0) return;       // desimal bebas, tidak diformat
+    var raw = el.value.replace(/[^\d]/g,"");
+    if(raw===""){ el.value=""; return; }
+    var n = parseInt(raw,10);
+    if(!isFinite(n)) n=0;
+    // pertahankan posisi caret relatif terhadap digit sebelum caret
+    var caret = el.selectionStart;
+    var digitsBefore = (el.value.substring(0,caret).match(/\d/g)||[]).length;
+    el.value = fmtInt(n);
+    // hitung posisi caret baru: lompat ke digit ke-digitsBefore
+    var newVal = el.value, pos=0, counted=0;
+    for(; pos<newVal.length && counted<digitsBefore; pos++){
+      if(/\d/.test(newVal[pos])) counted++;
+    }
+    try{ el.setSelectionRange(pos,pos); }catch(e){}
+  }
+  function attachFormatters(){
+    Array.prototype.forEach.call(document.querySelectorAll(".fmt-rp, .fmt-int"), function(el){
+      formatField(el);
+      el.addEventListener("input", function(){ formatField(el); });
+      el.addEventListener("blur", function(){ formatField(el); });
+    });
+    // pilih semua isi kolom saat fokus (mencegah nilai awal "0" jadi "02" saat diketik)
+    Array.prototype.forEach.call(document.querySelectorAll(".fmt-rp, .fmt-int, .fmt-dec"), function(el){
+      el.addEventListener("focus", function(){
+        try{ el.select(); }catch(e){}
+      });
+    });
+  }
+
+  /* ---------- Mode switching ---------- */
+  function switchMode(m, opts){
+    mode = m;
+    ["mfg","trd","svc"].forEach(function(k){
+      $("fields-"+k).style.display = (k===m) ? "block" : "none";
+    });
+    // sembunyikan hasil lama & reset hasil tersimpan saat ganti mode
+    if(!opts || !opts.silent){
+      $("result").classList.remove("show");
+      lastHppResult = null;
+    }
+    saveHppDraft();
+  }
+
+  /* ---------- Calculation ---------- */
+  // Biaya TETAP = overhead/angkut-simpan/operasional; BIAYA VARIABEL/unit = bahan/TK/pembelian/kemasan.
+  // BEP unit = biaya tetap / (harga bersih - biaya variabel per unit).
+  // forcePrice (opsional): bila >0, harga jual dipaksa ke nilai ini (dipakai tombol "Harga Target")
+  // sehingga semua turunan (netPrice, netProfit, BEP, warnings) dihitung konsisten di satu tempat.
+  function calc(forcePrice){
+    var res = {
+      total:0, perUnit:0, price:0, profit:0,
+      netPrice:0, netProfit:0, netMargin:0,
+      bep:0, bepStatus:"none", fixedCost:0, varCostPerUnit:0,
+      unitName:"", margin:0, marginBase:"cost",
+      mode:mode, units:1, breakdown:"",
+      fee:0, disc:0, pack:0,
+      warnings:[]
+    };
+    var u, fee, disc, pack, mat, lab, oh, buy, fr, st, smat, slab, soh;
+    if(mode==="mfg"){
+      mat=num("mfg_mat"); lab=num("mfg_lab"); oh=num("mfg_oh");
+      u=num("mfg_units"); fee=numPct("mfg_fee"); disc=numPct("mfg_disc"); pack=num("mfg_pack");
+      res.total = mat+lab+oh;
+      res.unitName = $("mfg_name").value || "Produk Manufaktur";
+      res.margin = numPct("mfg_margin"); res.marginBase=$("mfg_marginBase").value;
+      res.breakdown = "Bahan baku "+fmt(mat)+" + BTK "+fmt(lab)+" + Overhead "+fmt(oh);
+      // tetap: overhead ; variabel/unit: (bahan+BTK)/unit + kemasan
+      res.fixedCost = oh;
+      res.varCostPerUnit = (mat+lab)/u + pack;
+    } else if(mode==="trd"){
+      buy=num("trd_buy"); fr=num("trd_freight"); st=num("trd_storage");
+      u=num("trd_units"); fee=numPct("trd_fee"); disc=numPct("trd_disc"); pack=num("trd_pack");
+      res.total = buy+fr+st;
+      res.unitName = $("trd_name").value || "Produk Dagang";
+      res.margin = numPct("trd_margin"); res.marginBase=$("trd_marginBase").value;
+      res.breakdown = "Pembelian "+fmt(buy)+" + Angkut "+fmt(fr)+" + Penyimpanan "+fmt(st);
+      // tetap: angkut + simpan ; variabel/unit: pembelian/unit + kemasan
+      res.fixedCost = fr+st;
+      res.varCostPerUnit = buy/u + pack;
+    } else {
+      slab=num("svc_lab"); smat=num("svc_mat"); soh=num("svc_oh");
+      u=num("svc_units"); fee=numPct("svc_fee"); disc=0; pack=0;
+      res.total = slab+smat+soh;
+      res.unitName = $("svc_name").value || "Jasa/Proyek";
+      res.margin = numPct("svc_margin"); res.marginBase=$("svc_marginBase").value;
+      res.breakdown = "BTK "+fmt(slab)+" + Material "+fmt(smat)+" + Operasional "+fmt(soh);
+      // jasa: tetap = operasional ; variabel/unit = (TK+material)/unit
+      res.fixedCost = soh;
+      res.varCostPerUnit = (slab+smat)/u + pack;
+    }
+    // validasi unit
+    if(u<=0){
+      res.warnings.push("Jumlah unit 0 atau kosong — otomatis dianggap 1 unit untuk perhitungan.");
+      u=1;
+      // perhitungan ulang var/unit dengan u=1
+      if(mode==="mfg") res.varCostPerUnit = (mat+lab)/u + pack;
+      else if(mode==="trd") res.varCostPerUnit = buy/u + pack;
+      else res.varCostPerUnit = (slab+smat)/u + pack;
+    }
+    res.units = u;
+    // clamp diskon & fee ke [0,99] (>=100% membuat harga bersih nol/negatif)
+    if(disc>=100){ res.warnings.push("Diskon "+disc+"% dibatasi ke 99% (≥100% membuat harga bersih nol)."); disc=99; }
+    if(fee>=100){ res.warnings.push("Fee "+fee+"% dibatasi ke 99% (≥100% membuat harga bersih nol)."); fee=99; }
+    if(disc<0) disc=0; if(fee<0) fee=0;
+    res.fee=fee; res.disc=disc; res.pack=pack;
+
+    // HPP per unit (untuk tampilan): total/unit + kemasan
+    res.perUnit = (res.total/u) + pack;
+
+    // harga jual dari margin (kotor, sebelum diskon & fee) — kecuali forcePrice (dari Harga Target)
+    if(forcePrice>0){
+      res.price = forcePrice;
+      res.profit = forcePrice - res.perUnit;
+    } else {
+      var m = res.margin||0;
+      if(res.marginBase==="sales"){
+        var denom = 1 - m/100;
+        if(denom<=0){
+          res.price = res.perUnit; res.profit=0;
+          res.warnings.push("Margin dari harga jual ≥ 100% tidak valid — harga jual diset = HPP, profit Rp 0.");
+        } else {
+          res.price = res.perUnit/denom;
+          res.profit = res.price - res.perUnit;
+        }
+      } else {
+        res.price = res.perUnit*(1 + m/100);
+        res.profit = res.price - res.perUnit;
+      }
+    }
+
+    // harga bersih setelah diskon & fee marketplace
+    var afterDisc = res.price * (1 - disc/100);
+    var feeAmt = afterDisc * (fee/100);
+    res.netPrice = afterDisc - feeAmt;
+    res.netProfit = res.netPrice - res.perUnit;
+    res.netMargin = res.netPrice>0 ? (res.netProfit/res.netPrice*100) : 0;
+
+    // BEP (break even unit) = biaya TETAP / (harga bersih - biaya VARIABEL per unit)
+    // NB: varCostPerUnit TIDAK termasuk biaya tetap, jadi tidak dihitung ganda.
+    var contribution = res.netPrice - res.varCostPerUnit;
+    // bepStatus: "ok" | "unreachable" (kontribusi<=0) | "none" (biaya tetap 0)
+    if(res.fixedCost<=0){ res.bep = 0; res.bepStatus = "none"; }
+    else if(contribution<=0){ res.bep = 0; res.bepStatus = "unreachable"; }
+    else { res.bep = Math.ceil(res.fixedCost/contribution); res.bepStatus = "ok"; }
+    // peringatan jika BEP melebihi jumlah unit yang diproduksi/dijual
+    if(res.bepStatus==="ok" && res.bep>res.units){
+      res.warnings.push("BEP ("+res.bep+" unit) melebihi jumlah unit Anda ("+res.units+" unit). Perlu jual lebih banyak agar impas.");
+    }
+
+    return res;
+  }
+
+  // harga jual kotor yang diperlukan agar margin tercapai (setelah diskon & fee).
+  // Mengambil hasil calc() r dan menghitung ulang harga; dipakai tombol "Harga Target".
+  // margin "cost"  -> g = 1/(1+m)   (HPP/harga kotor)
+  // margin "sales" -> g = 1-m       (HPP/harga kotor)
+  function targetPriceFrom(r){
+    var m = r.margin||0;
+    var g = r.marginBase==="sales" ? (1 - m/100) : (1/(1 + m/100));
+    var nf = (1 - r.disc/100)*(1 - r.fee/100);
+    return (g>0 && nf>0) ? r.perUnit/g/nf : 0;
+  }
+
+  function renderResult(r){
+    $("r_hppunit").textContent = fmt(r.perUnit);
+    $("r_hpptotal").textContent = fmt(r.total);
+    $("r_price").textContent = fmt(r.price);
+    $("r_profit").textContent = fmt(r.profit);
+    $("r_netprice").textContent = fmt(r.netPrice);
+    $("r_netprofit").textContent = fmt(r.netProfit);
+    $("r_netmargin").textContent = pct(r.netMargin);
+    var bepText = fmtInt(r.bep);
+    if(r.bepStatus==="unreachable") bepText = "Tidak tercapai";
+    else if(r.bepStatus==="none") bepText = "—";
+    $("r_bep").textContent = bepText;
+    var note = "<b>Rincian:</b> "+escapeHtml(r.breakdown)+". Margin "+pct(r.margin)+" "+(r.marginBase==="sales"?"dari harga jual":"dari HPP")+".";
+    if(r.pack>0) note += " Kemasan "+fmt(r.pack)+"/unit masuk HPP.";
+    if(r.fee>0||r.disc>0) note += " Setelah diskon "+pct(r.disc)+" &amp; fee "+pct(r.fee)+": harga bersih "+fmt(r.netPrice)+", profit bersih "+fmt(r.netProfit)+"/unit.";
+    note += " Total keuntungan bersih ("+r.units+" unit): "+fmt(r.netProfit*r.units)+".";
+    if(r.bepStatus==="ok") note += " <b>BEP:</b> jual "+r.bep+" unit untuk impas (biaya tetap "+fmt(r.fixedCost)+" ÷ kontribusi "+fmt(r.netPrice-r.varCostPerUnit)+"/unit).";
+    else if(r.bepStatus==="unreachable") note += " <b>BEP:</b> tidak tercapai — harga bersih lebih kecil dari biaya variabel/unit, setiap unit terjual tetap rugi.";
+    else note += " <b>BEP:</b> tidak ada biaya tetap, jual 1 unit sudah impas.";
+    if(r.warnings.length>0){
+      note += " <span style='color:#c0392b'>⚠ "+escapeHtml(r.warnings.join(" "))+"</span>";
+    }
+    $("r_note").innerHTML = note;
+    $("result").classList.add("show");
+  }
+
+  /* ---------- History (localStorage) ---------- */
+  // normalisasi entri lama (v1) yang tidak punya field baru (netPrice, netProfit, hppPerUnit, bep)
+  // normalisasi & koersi ketat entri riwayat (anti data rusak / tipe salah dari import JSON)
+  // normalisasi & koersi ketat entri riwayat (anti data rusak / tipe salah dari import JSON).
+  // Validasi ketat di sini: return null bila objek bukan entri riwayat yang masuk akal
+  // (mode tidak dikenal, ts hilang/negatif, atau field wajib total/price/perUnit hilang).
+  function normalizeEntry(x){
+    if(!x || typeof x!=="object" || !MODE_LABEL[x.mode]) return null;
+    var ts = Number(x.ts);
+    if(!isFinite(ts) || ts<=0) return null;
+    var req = ["total","price","perUnit"];
+    for(var i=0;i<req.length;i++){ if(x[req[i]]==null || !isFinite(Number(x[req[i]]))) return null; }
+    var n = { ts:ts, mode:x.mode,
+      stamp:String(x.stamp || stampOf(new Date(ts))),
+      name:String(x.name==null?"":x.name), unitName:String(x.unitName==null?"":x.unitName),
+      marginBase:(x.marginBase==="sales")?"sales":"cost",
+      breakdown:String(x.breakdown==null?"":x.breakdown) };
+    ["total","perUnit","price","profit","netPrice","netProfit","netMargin","bep","fee","disc",
+     "pack","margin","fixedCost","varCostPerUnit","units"].forEach(function(k){
+      var v = Number(x[k]); n[k] = (x[k]!=null && isFinite(v)) ? v : 0;
+    });
+    // isi turunan HANYA bila field-nya memang tidak ada (data v1), jangan timpa nilai 0/negatif
+    if(x.netPrice==null)  n.netPrice  = n.price;
+    if(x.netProfit==null) n.netProfit = n.profit;
+    if(x.netMargin==null) n.netMargin = n.netPrice>0 ? n.netProfit/n.netPrice*100 : 0;
+    n.bepStatus = (x.bepStatus==="ok"||x.bepStatus==="unreachable"||x.bepStatus==="none")
+      ? x.bepStatus : (n.fixedCost<=0 ? "none" : (n.bep>0 ? "ok" : "unreachable"));
+    return n;
+  }
+  function loadHist(){
+    try{
+      var raw=localStorage.getItem(STORAGE_KEY);
+      var arr;
+      if(raw){
+        arr=JSON.parse(raw);
+        if(!Array.isArray(arr)) arr=[];
+      } else {
+        // migrasi dari v1: ambil data lama, normalisasi, simpan ke v2, hapus v1
+        var old=localStorage.getItem(STORAGE_KEY_OLD);
+        if(old){
+          try{
+            var oldArr=JSON.parse(old);
+            if(Array.isArray(oldArr)){
+              arr = oldArr.map(normalizeEntry).filter(Boolean);
+              try{
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+                localStorage.removeItem(STORAGE_KEY_OLD);   // bersihkan kunci lama setelah migrasi sukses
+              }catch(e){}
+            } else arr=[];
+          }catch(e){ arr=[]; }
+        } else arr=[];
+      }
+      return arr;
+    }catch(e){ return []; }
+  }
+  function saveHist(arr){
+    try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(arr)); }catch(e){ toast("Gagal menyimpan ke perangkat.","warn"); }
+  }
+  function isDupEntry(a, b){
+    if(!a||!b) return false;
+    return a.mode===b.mode && a.name===b.name && a.units===b.units &&
+      a.total===b.total && a.perUnit===b.perUnit && a.price===b.price &&
+      a.margin===b.margin && a.netProfit===b.netProfit;
+  }
+  function addHistory(r){
+    var arr=loadHist();
+    var entry = {
+      ts: Date.now(),
+      stamp: nowStamp(),
+      mode:r.mode, name:r.unitName, units:r.units,
+      total:r.total, perUnit:r.perUnit, price:r.price, profit:r.profit,
+      netPrice:r.netPrice, netProfit:r.netProfit, netMargin:r.netMargin,
+      bep:r.bep, bepStatus:r.bepStatus||"none", fixedCost:r.fixedCost, varCostPerUnit:r.varCostPerUnit,
+      margin:r.margin, marginBase:r.marginBase, breakdown:r.breakdown,
+      fee:r.fee, disc:r.disc, pack:r.pack
+    };
+    // cegah duplikat berturut-turut
+    if(arr.length>0 && isDupEntry(arr[0], entry)){
+      toast("Hasil identik dengan entri terakhir — tidak disimpan ulang.");
+      return false;
+    }
+    arr.unshift(entry);
+    if(arr.length>200) arr=arr.slice(0,200);
+    saveHist(arr);
+    renderHistory();
+    return true;
+  }
+  function deleteHist(ts){
+    var arr=loadHist();
+    var idx=-1;
+    for(var i=0;i<arr.length;i++){ if(arr[i].ts===ts){ idx=i; break; } }
+    if(idx<0) return;
+    var removed = arr.splice(idx,1)[0];
+    saveHist(arr); renderHistory();
+    // simpan untuk undo
+    undoStack.push({entry:removed, index:idx});
+    showUndo();
+  }
+  function showUndo(){
+    var bar = $("undoBar");
+    if(!bar) return;
+    if(undoStack.length>0){
+      bar.style.display="flex";
+      bar.querySelector(".undo-msg").textContent = "Dihapus: "+(undoStack[undoStack.length-1].entry.name||"entri")+" — ";
+    } else {
+      bar.style.display="none";
+    }
+  }
+  function undoDelete(){
+    if(undoStack.length===0) return;
+    var item = undoStack.pop();
+    var arr=loadHist();
+    var idx = Math.min(item.index, arr.length);
+    arr.splice(idx,0,item.entry);
+    saveHist(arr); renderHistory();
+    showUndo();
+    toast("Entri dikembalikan.","ok");
+  }
+  function clearHist(){
+    if(!confirm("Hapus semua riwayat? Tindakan ini tidak dapat dibatalkan.")) return;
+    saveHist([]); undoStack=[]; renderHistory(); showUndo(); toast("Riwayat dihapus.");
+  }
+
+  function getFilteredHist(){
+    var arr=loadHist();
+    var q=($("histSearch").value||"").toLowerCase().trim();
+    var f=$("histFilter").value;
+    return arr.filter(function(it){
+      if(f!=="all" && it.mode!==f) return false;
+      if(q && (String(it.name||"").toLowerCase().indexOf(q)<0)) return false;
+      return true;
+    });
+  }
+  function renderHistory(){
+    var all=loadHist();
+    $("historyWrap").classList.add("show");
+    $("histCount").textContent = "("+all.length+")";
+    var body=$("histBody");
+    if(all.length===0){
+      body.innerHTML="";
+      $("emptyHint").style.display="block";
+      $("histShown").textContent="";
+      return;
+    }
+    $("emptyHint").style.display="none";
+    var arr=getFilteredHist();
+    $("histShown").textContent = "Menampilkan "+arr.length+" dari "+all.length;
+    body.innerHTML = arr.map(function(it){
+      // it.mode & it.ts di-escape untuk mencegah XSS dari import
+      var safeMode = escapeHtml(it.mode);
+      var modeLbl = MODE_LABEL[it.mode] ? MODE_LABEL[it.mode] : escapeHtml(it.mode);
+      var safeTs = escapeHtml(it.ts);
+      return '<tr>'+
+        '<td>'+escapeHtml(it.stamp)+'</td>'+
+        '<td><span class="tag '+safeMode+'">'+modeLbl+'</span></td>'+
+        '<td>'+escapeHtml(it.name)+'</td>'+
+        '<td>'+escapeHtml(it.units)+'</td>'+
+        '<td>'+fmt(it.total)+'</td>'+
+        '<td>'+fmt(it.perUnit)+'</td>'+
+        '<td>'+fmt(it.price)+'</td>'+
+        '<td>'+fmt(it.profit)+'</td>'+
+        '<td>'+(it.bepStatus==="unreachable"?"Tidak tercapai":(it.bepStatus==="none"?"—":escapeHtml(fmtInt(it.bep))))+'</td>'+
+        '<td>'+pct(it.margin)+'</td>'+
+        '<td><button class="btn-mini danger" data-del="'+safeTs+'" style="padding:4px 9px" aria-label="Hapus entri">✕</button></td>'+
+      '</tr>';
+    }).join("");
+    Array.prototype.forEach.call(body.querySelectorAll("[data-del]"), function(b){
+      b.addEventListener("click", function(){
+        var ts=parseFloat(b.getAttribute("data-del"));
+        if(isFinite(ts)) deleteHist(ts);
+      });
+    });
+  }
+
+  /* ---------- Export / Import / Backup ---------- */
+  // sel CSV: pemisah ;, desimal koma (locale ID). Sel teks berawalan = + - @ diawali ' agar
+  // tidak dieksekusi sebagai formula. Sel berisi " ; \n dibungkus kutip ganda.
+  function cell(c){
+    var isNum = typeof c === "number";
+    var s = isNum ? String(Math.round(c*100)/100).replace(".", ",") : String(c==null?"":c);
+    if(!isNum && /^[=+\-@]/.test(s)) s = "'" + s;
+    if(/[";\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function exportCSV(){
+    var arr=loadHist();
+    if(arr.length===0){ toast("Belum ada data untuk diexport.","warn"); return; }
+    var rows=[["Waktu","Mode","Nama","Unit","Total HPP","HPP per Unit","Harga Jual","Profit per Unit","Harga Bersih","Profit Bersih","Margin Bersih","BEP","Status BEP","Margin %","Dasar Margin","Rincian"]];
+    arr.forEach(function(it){
+      var bepTxt = it.bepStatus==="unreachable" ? "Tidak tercapai" : (it.bepStatus==="none" ? "—" : it.bep);
+      rows.push([it.stamp, MODE_LABEL[it.mode]||it.mode, it.name, it.units, it.total, it.perUnit, it.price, it.profit, it.netPrice, it.netProfit, it.netMargin, bepTxt, it.bepStatus||"none", it.margin, it.marginBase==="sales"?"dari harga jual":"dari HPP", it.breakdown]);
+    });
+    // Excel locale Indonesia sudah memakai ; sebagai pemisah daftar, jadi tidak perlu baris sep=;
+    // (baris itu justru tampil sebagai data di Google Sheets & LibreOffice).
+    var csv = rows.map(function(r){
+      return r.map(cell).join(";");
+    }).join("\n");
+    downloadBlob("\ufeff"+csv, "riwayat-hpp-"+Date.now()+".csv", "text/csv;charset=utf-8");
+    toast("CSV berhasil diunduh.","ok");
+  }
+  function backupJSON(){
+    var arr=loadHist();
+    var plans=loadPlans();
+    if(arr.length===0 && plans.length===0){ toast("Belum ada data untuk di-backup.","warn"); return; }
+    var payload = JSON.stringify({
+      app:"kalkulator-hpp", version:2, exportedAt:new Date().toISOString(),
+      history: arr,
+      plans: plans
+    }, null, 2);
+    downloadBlob(payload, "backup-hpp-"+Date.now()+".json", "application/json");
+    toast("Backup JSON berhasil diunduh ("+arr.length+" riwayat, "+plans.length+" rencana).","ok");
+  }
+  function downloadBlob(content, filename, type){
+    var blob=new Blob([content],{type:type});
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
+  }
+  // validasi tiap entri sebelum disimpan (cegah data salah / undefined / XSS via mode)
+  // validasi ketat sudah dilakukan di normalizeEntry; di sini cukup pastikan objek ada
+  function isValidEntry(x){ return !!x; }
+  // normalisasi & koersi ketat entri rencana (anti XSS via import JSON & data rusak).
+  // idx (opsional) dipakai agar rencana tanpa ts mendapat fallback unik (Date.now()+idx),
+  // bukan Date.now() yang sama untuk semua — sehingga tidak saling menghapus saat dedup.
+  function normalizePlan(p, idx){
+    if(!p || typeof p!=="object") return null;
+    var ts = Number(p.ts);
+    var n = {
+      ts: (isFinite(ts) && ts>0) ? ts : (Date.now() + (idx||0)),
+      stamp: String(p.stamp||""),
+      name: String(p.name||"Produk/Usaha"),
+      unit: UNIT_SHORT[p.unit] ? p.unit : "month"
+    };
+    ["target","dur","workdaysPerWeek","holiday","price","hppPerUnit","capacity",
+     "dailyOmset","profitTotal","profitPerUnit","unitsTotal","unitsDaily","hppTotal","totalWorkdays"]
+      .forEach(function(k){ var v=Number(p[k]); n[k]=isFinite(v)?v:0; });
+    return n.target>0 ? n : null;
+  }
+  function importJSON(file){
+    var reader=new FileReader();
+    reader.onload=function(e){
+      try{
+        var data=JSON.parse(e.target.result);
+        // dukung format backup {history:[...], plans:[...]} atau array langsung (history)
+        var plansData = (data && Array.isArray(data.plans)) ? data.plans : null;
+        if(data && Array.isArray(data.history)) data=data.history;
+        if(!Array.isArray(data)) data=[];   // bisa jadi hanya plans tanpa history
+        // normalisasi entri (isi field baru untuk data lama) lalu validasi
+        var norm = data.map(normalizeEntry).filter(Boolean);
+        var ok = norm.filter(isValidEntry);
+        var skipped = norm.length - ok.length;
+        // merge history (dedup berdasarkan ts)
+        var histMerged = ok.concat(loadHist());
+        var seen={}; histMerged = histMerged.filter(function(x){
+          if(seen[x.ts]) return false; seen[x.ts]=true; return true;
+        });
+        if(histMerged.length>200) histMerged=histMerged.slice(0,200);
+        saveHist(histMerged);
+        // merge plans jika ada
+        var plansImported = 0;
+        if(plansData && plansData.length>0){
+          var validPlans = plansData.map(function(p,i){ return normalizePlan(p,i); }).filter(Boolean);
+          var planMerged = validPlans.concat(loadPlans());
+          var pseen={}; planMerged = planMerged.filter(function(x){
+            var key=(x.ts||0)+"|"+(x.target||0)+"|"+(x.name||"");
+            if(pseen[key]) return false; pseen[key]=true; return true;
+          });
+          if(planMerged.length>100) planMerged=planMerged.slice(0,100);
+          savePlans(planMerged);
+          plansImported = validPlans.length;
+        }
+        renderHistory(); renderPlanList();
+        if(ok.length===0 && plansImported===0){
+          toast("Gagal import: tidak ada entri valid.","warn"); return;
+        }
+        var msg = "Import berhasil: "+ok.length+" riwayat";
+        if(plansImported>0) msg += ", "+plansImported+" rencana";
+        if(skipped>0) msg += ". "+skipped+" entri tidak valid dilewati";
+        msg += ".";
+        toast(msg,"ok");
+      }catch(err){ toast("Gagal import: file JSON tidak valid.","warn"); }
+    };
+    reader.readAsText(file);
+  }
+
+  /* ---------- Target Planner ---------- */
+  function unitToDays(unit, dur){
+    if(unit==="day") return dur;
+    if(unit==="week") return dur*7;
+    if(unit==="month") return dur*30;
+    if(unit==="year") return dur*365;
+    return dur;
+  }
+
+  function calcPlan(){
+    var target = num("pl_target");
+    var dur = Math.max(1, num("pl_dur"));
+    var unit = $("pl_unit").value;
+    var workdaysPerWeek = Math.min(7, Math.max(1, num("pl_workdays")||6));
+    var holiday = Math.max(0, num("pl_holiday")||0);
+    var price = num("pl_price");
+    var hppPerUnit = num("pl_hpp");
+    var capacity = Math.max(0, num("pl_capacity")||0);
+
+    var totalDays = unitToDays(unit, dur);
+    var totalWeeks = totalDays/7;
+    // hari kerja nyata = minggu * hari/mgg, dikurangi hari libur
+    // Math.round agar periode pendek (mis. 6 hari dgn 6 hari/mgg) tidak dibulatkan ke bawah jadi 5
+    var rawWorkdays = Math.round(totalWeeks * workdaysPerWeek);
+    var planWarnings = [];
+    if(holiday > rawWorkdays){
+      planWarnings.push("Hari libur ("+holiday+") lebih banyak dari hari kerja ("+rawWorkdays+"). Hari kerja dijaga minimum 1.");
+    }
+    var totalWorkdays = rawWorkdays - holiday;
+    if(totalWorkdays<1) totalWorkdays=1;
+
+    var dailyOmset = target/totalWorkdays;
+    // Mingguan & bulanan konsisten berbasis harian (bukan dibagi total kalender)
+    var weeklyOmset = dailyOmset * workdaysPerWeek;
+    var monthlyOmset = dailyOmset * (workdaysPerWeek * 52 / 12);
+
+    // profit dihitung dari HPP per unit & harga jual (bukan dari margin diketik)
+    var profitPerUnit = price>0 ? (price - hppPerUnit) : 0;
+    var unitsTotal = price>0 ? target/price : 0;
+    var unitsDaily = price>0 ? unitsTotal/totalWorkdays : 0;
+    // profit total = profit per unit * unit terjual
+    var profitTotal = profitPerUnit * unitsTotal;
+    var profitDaily = profitTotal/totalWorkdays;
+    var hppTotal = hppPerUnit * unitsTotal;
+    // rate profit (untuk ditampilkan) = profit/omset
+    var profitRate = target>0 ? profitTotal/target : 0;
+    // BEP planner tidak dihitung dari hppTotal (berubah mengikuti target) — dikosongkan.
+    // BEP sebenarnya ada di kalkulator HPP (biaya tetap/kontribusi).
+    var bepUnit = 0;
+
+    return {
+      name: $("pl_name").value || "Produk/Usaha",
+      target: target, dur: dur, unit: unit,
+      workdaysPerWeek: workdaysPerWeek, holiday: holiday,
+      totalDays: totalDays, totalWorkdays: totalWorkdays,
+      price: price, hppPerUnit: hppPerUnit, capacity: capacity,
+      dailyOmset: dailyOmset, weeklyOmset: weeklyOmset, monthlyOmset: monthlyOmset,
+      profitPerUnit: profitPerUnit, profitTotal: profitTotal, profitDaily: profitDaily,
+      profitRate: profitRate, hppTotal: hppTotal,
+      unitsTotal: unitsTotal, unitsDaily: unitsDaily, bepUnit: bepUnit,
+      planWarnings: planWarnings,
+      stamp: nowStamp()
+    };
+  }
+
+  function renderPlan(p){
+    $("pr_daily").textContent = fmt(p.dailyOmset);
+    $("pr_dailySub").textContent = "per hari kerja ("+p.workdaysPerWeek+" hari/mgg"+(p.holiday>0?", "+p.holiday+" hari libur":"")+")";
+    $("pr_weekly").textContent = fmt(p.weeklyOmset);
+    $("pr_monthly").textContent = fmt(p.monthlyOmset);
+    $("pr_profitTotal").textContent = fmt(p.profitTotal);
+    $("pr_profitSub").textContent = pct(p.profitRate*100)+" dari omset";
+    $("pr_profitDaily").textContent = fmt(p.profitDaily);
+    $("pr_units").textContent = fmtInt(Math.ceil(p.unitsTotal));
+    $("pr_unitsSub").textContent = "total selama "+unitLabel(p.unit,p.dur);
+    $("pr_unitsDaily").textContent = fmtInt(Math.ceil(p.unitsDaily));
+    $("pr_hppUnit").textContent = fmt(p.hppPerUnit);
+    $("pr_workdays").textContent = fmtInt(p.totalWorkdays);
+
+    var feasibility = "";
+    var warn=false;
+    if(p.target<=0){
+      feasibility = "<b>⚠ Isi target omset</b> lebih dari Rp 0."; warn=true;
+    } else if(p.price<=0){
+      feasibility = "<b>⚠ Harga jual Rp 0</b> — jumlah unit & profit tidak bisa dihitung. Isi harga jual (atau klik <b>Pakai Hasil HPP</b>)."; warn=true;
+    } else if(p.hppPerUnit<=0){
+      feasibility = "<b>⚠ HPP per unit Rp 0</b> — profit dianggap 100% dari omset (tidak realistis). Isi HPP per unit (atau klik <b>Pakai Hasil HPP</b>)."; warn=true;
+    } else if(p.profitPerUnit<0){
+      feasibility = "<b>⚠ Harga jual lebih rendah dari HPP!</b> Anda rugi "+fmt(-p.profitPerUnit)+"/unit. Naikkan harga jual atau turunkan HPP."; warn=true;
+    } else {
+      var udCeil = Math.ceil(p.unitsDaily);
+      // bandingkan unitsDaily asli (bukan ceil) agar "target ringan" tetap terdeteksi
+      if(p.unitsDaily < 1){
+        feasibility = "<b>✓ Target ringan:</b> cukup jual <b>"+Math.ceil(p.unitsTotal)+" unit</b> total (kurang dari 1 unit/hari). Pertimbangkan menaikkan target.";
+      } else if(p.capacity>0 && p.unitsDaily>p.capacity){
+        feasibility = "<b>⚠ Melebihi kapasitas:</b> butuh <b>"+udCeil+" unit/hari</b> tapi kapasitas hanya "+p.capacity+" unit/hari. Tambah kapasitas, hari kerja, atau turunkan target."; warn=true;
+      } else if(p.capacity>0){
+        feasibility = "<b>✓ Sesuai kapasitas:</b> butuh <b>"+udCeil+" unit/hari</b>, kapasitas Anda "+p.capacity+" unit/hari — realistis.";
+      } else {
+        feasibility = "<b>✓ Target realistis:</b> sekitar <b>"+udCeil+" unit per hari kerja</b> selama "+unitLabel(p.unit,p.dur)+".";
+      }
+    }
+    var estNote = " <i>(estimasi: 1 bulan=30 hari, 1 minggu=7 hari)</i>";
+    var warnNote = (p.planWarnings && p.planWarnings.length>0)
+      ? " <span style='color:#c0392b'>⚠ "+escapeHtml(p.planWarnings.join(" "))+"</span>" : "";
+    $("pr_note").innerHTML = feasibility +
+      " <b>Rincian:</b> omset "+fmt(p.target)+" ÷ "+p.totalWorkdays+" hari kerja = "+fmt(p.dailyOmset)+"/hari. " +
+      "Profit/unit "+fmt(p.profitPerUnit)+" (harga jual "+fmt(p.price)+" − HPP "+fmt(p.hppPerUnit)+"). " +
+      "Profit total "+fmt(p.profitTotal)+" ("+pct(p.profitRate*100)+" dari omset). Modal/HPP estimasi "+fmt(p.hppTotal)+"."+estNote+warnNote;
+    if(warn) $("pr_note").style.color="#c0392b"; else $("pr_note").style.color="";
+    $("planResult").classList.add("show");
+  }
+
+  function loadPlans(){
+    try{
+      var raw=localStorage.getItem(PLAN_KEY);
+      var arr;
+      if(raw){
+        arr=JSON.parse(raw); if(!Array.isArray(arr)) arr=[];
+      } else {
+        // migrasi dari v1
+        var old=localStorage.getItem("kalkulator_hpp_plans_v1");
+        if(old){
+          try{
+            var oldArr=JSON.parse(old);
+            if(Array.isArray(oldArr)){
+              arr=oldArr.map(function(x){
+                if(!x) return null;
+                if(x.hppPerUnit==null) x.hppPerUnit = 0;
+                if(x.profitPerUnit==null) x.profitPerUnit = (x.price||0)-x.hppPerUnit;
+                if(x.capacity==null) x.capacity = 0;
+                if(x.holiday==null) x.holiday = 0;
+                if(x.bepUnit==null) x.bepUnit = 0;
+                return x;
+              }).filter(Boolean);
+              try{
+                localStorage.setItem(PLAN_KEY, JSON.stringify(arr));
+                localStorage.removeItem("kalkulator_hpp_plans_v1");  // bersihkan kunci lama
+              }catch(e){}
+            } else arr=[];
+          }catch(e){ arr=[]; }
+        } else arr=[];
+      }
+      return arr;
+    }catch(e){ return []; }
+  }
+  function savePlans(arr){
+    try{ localStorage.setItem(PLAN_KEY, JSON.stringify(arr)); }catch(e){ toast("Gagal menyimpan rencana.","warn"); }
+  }
+  function isDupPlan(a,b){
+    if(!a||!b) return false;
+    return a.name===b.name && a.target===b.target && a.dur===b.dur &&
+      a.unit===b.unit && a.price===b.price && a.hppPerUnit===b.hppPerUnit;
+  }
+  function addPlan(p){
+    var arr=loadPlans();
+    var entry = {
+      ts: Date.now(), stamp: p.stamp, name:p.name, target:p.target,
+      dur:p.dur, unit:p.unit, workdaysPerWeek:p.workdaysPerWeek, holiday:p.holiday,
+      price:p.price, hppPerUnit:p.hppPerUnit, capacity:p.capacity,
+      dailyOmset:p.dailyOmset, profitTotal:p.profitTotal, profitPerUnit:p.profitPerUnit,
+      unitsTotal:p.unitsTotal, unitsDaily:p.unitsDaily, hppTotal:p.hppTotal,
+      totalWorkdays:p.totalWorkdays
+    };
+    if(arr.length>0 && isDupPlan(arr[0],entry)){
+      toast("Rencana identik dengan entri terakhir — tidak disimpan ulang.");
+      return false;
+    }
+    arr.unshift(entry);
+    if(arr.length>100) arr=arr.slice(0,100);
+    savePlans(arr); renderPlanList();
+    return true;
+  }
+  function deletePlan(ts){
+    var arr=loadPlans().filter(function(x){return x.ts!==ts});
+    savePlans(arr); renderPlanList();
+  }
+  function clearPlans(){
+    if(!confirm("Hapus semua rencana target?")) return;
+    savePlans([]); renderPlanList(); toast("Rencana dihapus.");
+  }
+  function renderPlanList(){
+    var arr=loadPlans();
+    $("planCount").textContent = "("+arr.length+")";
+    $("btnPlanClear").style.display = arr.length>0 ? "inline-flex" : "none";
+    var list=$("planList");
+    if(arr.length===0){
+      list.innerHTML=""; $("planEmpty").style.display="block"; return;
+    }
+    $("planEmpty").style.display="none";
+    list.innerHTML = arr.map(function(it){
+      var safeTs = escapeHtml(it.ts);
+      return '<div class="plan-row">'+
+        '<div class="pmeta"><span><b>'+escapeHtml(it.name)+'</b> — target '+fmt(it.target)+' dalam '+it.dur+' '+(UNIT_SHORT[it.unit]||escapeHtml(it.unit))+'</span>'+
+        '<small>'+escapeHtml(it.stamp)+' • '+it.workdaysPerWeek+' hari/mgg • '+Math.ceil(it.unitsDaily)+'/hari • HPP '+fmt(it.hppPerUnit)+'</small></div>'+
+        '<div class="pvals"><span>Omset/hari <b>'+fmt(it.dailyOmset)+'</b></span><span>Profit <b>'+fmt(it.profitTotal)+'</b></span>'+
+        '<button class="del" data-pdel="'+safeTs+'" title="Hapus" aria-label="Hapus rencana '+escapeHtml(it.name)+'">✕</button></div>'+
+      '</div>';
+    }).join("");
+    Array.prototype.forEach.call(list.querySelectorAll("[data-pdel]"), function(b){
+      b.addEventListener("click", function(){
+        var ts=parseFloat(b.getAttribute("data-pdel"));
+        if(isFinite(ts)) deletePlan(ts);
+      });
+    });
+  }
+
+  function savePlanDraft(){
+    var draft={
+      name:$("pl_name").value, target:$("pl_target").value, dur:$("pl_dur").value,
+      unit:$("pl_unit").value, workdays:$("pl_workdays").value, holiday:$("pl_holiday").value,
+      hpp:$("pl_hpp").value, price:$("pl_price").value, capacity:$("pl_capacity").value
+    };
+    try{ localStorage.setItem(PLAN_LAST, JSON.stringify(draft)); }catch(e){}
+  }
+  function loadPlanDraft(){
+    try{
+      var d=JSON.parse(localStorage.getItem(PLAN_LAST)||"{}");
+      if(d.name!=null) $("pl_name").value=d.name;
+      if(d.target!=null) $("pl_target").value=d.target;
+      if(d.dur!=null) $("pl_dur").value=d.dur;
+      if(d.unit!=null) $("pl_unit").value=d.unit;
+      if(d.workdays!=null) $("pl_workdays").value=d.workdays;
+      if(d.holiday!=null) $("pl_holiday").value=d.holiday;
+      if(d.hpp!=null) $("pl_hpp").value=d.hpp;
+      if(d.price!=null) $("pl_price").value=d.price;
+      if(d.capacity!=null) $("pl_capacity").value=d.capacity;
+    }catch(e){}
+  }
+
+  /* ---------- Draft HPP ---------- */
+  function saveHppDraft(){
+    var draft={ mode:mode };
+    ["mfg","trd","svc"].forEach(function(m){
+      var obj={};
+      Array.prototype.forEach.call($("fields-"+m).querySelectorAll("input,select"), function(el){
+        if(el.id && el.id.indexOf(m+"_")===0) obj[el.id]=el.value;
+      });
+      draft[m]=obj;
+    });
+    try{ localStorage.setItem(DRAFT_HPP, JSON.stringify(draft)); }catch(e){}
+  }
+  function loadHppDraft(){
+    try{
+      var d=JSON.parse(localStorage.getItem(DRAFT_HPP)||"null");
+      if(!d) return;
+      if(d.mode && MODE_LABEL[d.mode]){
+        $("mode").value=d.mode;
+        switchMode(d.mode,{silent:true});
+      }
+      ["mfg","trd","svc"].forEach(function(m){
+        if(d[m]){
+          var obj=d[m];
+          Object.keys(obj).forEach(function(k){
+            var el=$(k);
+            if(el){ el.value=obj[k]; }
+          });
+        }
+      });
+    }catch(e){}
+  }
+
+  /* ---------- Share via WhatsApp ---------- */
+  function shareHpp(r){
+    var txt = "*Kalkulator HPP — "+(r.unitName||"")+"*\n";
+    txt += "Mode: "+(MODE_LABEL[r.mode]||r.mode)+"\n";
+    txt += "• HPP per unit: "+fmt(r.perUnit)+"\n";
+    txt += "• Total HPP: "+fmt(r.total)+"\n";
+    txt += "• Harga jual: "+fmt(r.price)+"\n";
+    txt += "• Profit/unit: "+fmt(r.profit)+"\n";
+    if(r.fee>0||r.disc>0){
+      txt += "• Harga bersih (setelah diskon & fee): "+fmt(r.netPrice)+"\n";
+      txt += "• Profit bersih/unit: "+fmt(r.netProfit)+"\n";
+    }
+    if(r.bepStatus==="ok") txt += "• BEP: "+r.bep+" unit untuk impas\n";
+    else if(r.bepStatus==="unreachable") txt += "• BEP: tidak tercapai (harga bersih < biaya variabel/unit)\n";
+    txt += "• Total keuntungan bersih ("+r.units+" unit): "+fmt(r.netProfit*r.units)+"\n";
+    txt += "\nDibuat dengan Kalkulator HPP by Ratakiri";
+    window.open("https://wa.me/?text="+encodeURIComponent(txt), "_blank", "noopener");
+  }
+  function sharePlan(p){
+    var txt = "*Perencanaan Target Omset — "+(p.name||"")+"*\n";
+    txt += "• Target omset: "+fmt(p.target)+"\n";
+    txt += "• Periode: "+p.dur+" "+(UNIT_LABEL[p.unit]||p.unit)+"\n";
+    txt += "• Hari kerja: "+p.totalWorkdays+" hari\n";
+    txt += "• Omset/hari: "+fmt(p.dailyOmset)+"\n";
+    txt += "• Omset/minggu: "+fmt(p.weeklyOmset)+"\n";
+    txt += "• Omset/bulan: "+fmt(p.monthlyOmset)+"\n";
+    txt += "• Profit total: "+fmt(p.profitTotal)+"\n";
+    txt += "• Profit/hari: "+fmt(p.profitDaily)+"\n";
+    txt += "• Unit harus terjual: "+Math.ceil(p.unitsTotal)+" ("+Math.ceil(p.unitsDaily)+"/hari)\n";
+    txt += "\nDibuat dengan Kalkulator HPP by Ratakiri";
+    window.open("https://wa.me/?text="+encodeURIComponent(txt), "_blank", "noopener");
+  }
+
+  /* ---------- Pakai Hasil HPP (auto-fill planner) ---------- */
+  function applyHppToPlanner(){
+    // Pakai Hasil HPP: hanya jika sudah pernah HITUNG (lastHppResult ada & tidak basi).
+    // Jangan pakai angka contoh bawaan calc() bagi pengguna baru; jangan pula membuka panel hasil.
+    if(!lastHppResult || hppDirty){
+      toast("Belum ada hasil HPP. Klik HITUNG HPP dulu.","warn"); return;
+    }
+    var r = lastHppResult;
+    if(r.perUnit>0) $("pl_hpp").value = fmtInt(r.perUnit);
+    // bawa HARGA BERSIH (setelah diskon & fee) agar profit konsisten dgn yang dilihat user
+    var usePrice = (r.netPrice>0) ? r.netPrice : r.price;
+    if(usePrice>0) $("pl_price").value = fmtInt(usePrice);
+    // nama: dari r.name (riwayat) atau r.unitName (hasil calc)
+    if(!$("pl_name").value && (r.name || r.unitName)) $("pl_name").value = (r.name || r.unitName);
+    formatField($("pl_hpp")); formatField($("pl_price"));
+    savePlanDraft();
+    toast("HPP & harga bersih terisi dari hasil HPP ("+(MODE_LABEL[r.mode]||"")+").","ok");
+  }
+
+  /* ---------- Events ---------- */
+  $("mode").addEventListener("change", function(){ switchMode(this.value); saveHppDraft(); });
+
+  // tampilkan toast berdasarkan hasil calc: peringatan jika ada, else "dihitung"
+  function announceCalc(r){
+    if(r.warnings && r.warnings.length>0){
+      toast("⚠ "+r.warnings.join(" "),"warn");
+    } else {
+      toast("HPP dihitung.","ok");
+    }
+  }
+  // Kembalikan hasil HPP yang valid: pakai lastHppResult jika input belum berubah (hppDirty=false),
+  // jika tidak, hitung ulang dari input terbaru. Mencegah Simpan/Bagikan/Pakai Hasil memakai angka basi
+  // SEKALIGUS menjaga hasil "Harga Target" tetap utuh saat Simpan/Bagikan.
+  function currentHpp(){
+    if(!hppDirty && lastHppResult) return lastHppResult;
+    var r = calc(); renderResult(r); lastHppResult = r; hppDirty = false; return r;
+  }
+  $("btnCalc").addEventListener("click", function(){
+    var r=calc();
+    renderResult(r);
+    lastHppResult = r; hppDirty = false;
+    saveHppDraft();
+    announceCalc(r);
+    if(window.innerWidth<760){ $("result").scrollIntoView({behavior:"smooth",block:"nearest"}); }
+  });
+  // Simpan & Bagikan pakai currentHpp(): menyimpan/membagikan angka yang sedang tampil (termasuk Harga Target)
+  $("btnSaveHpp").addEventListener("click", function(){
+    var r = currentHpp();
+    if(addHistory(r)){ toast("Hasil disimpan ke riwayat.","ok"); }
+  });
+  $("btnShareHpp").addEventListener("click", function(){
+    var r = currentHpp();
+    shareHpp(r);
+  });
+  // Hitung harga jual kotor agar margin tercapai (setelah diskon & fee)
+  // Pakai calc(forcePrice) agar BEP, netPrice, warnings dst. dihitung konsisten di satu tempat.
+  $("btnTargetPrice").addEventListener("click", function(){
+    var base = calc();                 // ambil HPP/margin/diskon/fee dari input
+    var tp = targetPriceFrom(base);    // harga kotor yang dipaksa
+    if(tp<=0){ toast("Tidak bisa dihitung — periksa margin, diskon & fee (margin<100%, diskon<100%, fee<100%).","warn"); return; }
+    var r = calc(tp);                  // hitung ulang dgn harga paksa -> BEP/netPrice/warnings benar
+    renderResult(r);
+    lastHppResult = r; hppDirty = false;
+    // label margin sesuai dasar: "markup bersih X% dari HPP" atau "margin bersih X% dari harga jual"
+    var mLabel = r.marginBase==="sales"
+      ? "margin bersih "+pct(r.margin)+" dari harga jual"
+      : "markup bersih "+pct(r.margin)+" dari HPP";
+    toast("Harga jual "+fmt(tp)+" agar "+mLabel+" tercapai (setelah diskon & fee).","ok");
+  });
+
+  $("btnExport").addEventListener("click", exportCSV);
+  $("btnBackup").addEventListener("click", backupJSON);
+  $("btnImport").addEventListener("click", function(){$("fileImport").click()});
+  $("fileImport").addEventListener("change", function(e){
+    if(e.target.files && e.target.files[0]) importJSON(e.target.files[0]);
+    e.target.value="";
+  });
+  $("btnClear").addEventListener("click", clearHist);
+  $("btnPlanClear").addEventListener("click", clearPlans);
+  $("histSearch").addEventListener("input", renderHistory);
+  $("histFilter").addEventListener("change", renderHistory);
+  var undoBtn = document.querySelector(".undo-btn");
+  if(undoBtn) undoBtn.addEventListener("click", undoDelete);
+
+  /* Planner events */
+  $("btnPlan").addEventListener("click", function(){
+    var p=calcPlan();
+    renderPlan(p);
+    savePlanDraft();
+    toast("Rencana dihitung.","ok");
+    if(window.innerWidth<760){ $("planResult").scrollIntoView({behavior:"smooth",block:"nearest"}); }
+  });
+  $("btnSavePlan").addEventListener("click", function(){
+    var p = calcPlan();
+    renderPlan(p);
+    if(addPlan(p)){ toast("Rencana disimpan.","ok"); }
+  });
+  $("btnSharePlan").addEventListener("click", function(){
+    var p=calcPlan();
+    renderPlan(p);
+    if(p.target<=0){ toast("Isi target omset dulu.","warn"); return; }
+    sharePlan(p);
+  });
+  $("btnPlanAuto").addEventListener("click", applyHppToPlanner);
+
+  // simpan draft saat user mengetik di field planner & HPP (input, bukan change)
+  ["pl_name","pl_target","pl_dur","pl_workdays","pl_holiday","pl_hpp","pl_price","pl_capacity","pl_unit"].forEach(function(id){
+    var el=$(id); if(el) el.addEventListener("input", savePlanDraft);
+  });
+  var plUnit=$("pl_unit"); if(plUnit) plUnit.addEventListener("change", savePlanDraft);
+  // draft HPP: simpan saat input field HPP berubah, dan tandai hasil basi (hppDirty)
+  Array.prototype.forEach.call(document.querySelectorAll("#mode, .mode-fields input, .mode-fields select"), function(el){
+    el.addEventListener("input", function(){ hppDirty = true; saveHppDraft(); });
+  });
+  $("mode").addEventListener("change", function(){ hppDirty = true; });
+
+  // Enter key triggers calc HANYA di dalam form .app (HPP) atau .planner
+  // (tidak di kolom cari riwayat, search, dll.)
+  document.addEventListener("keydown", function(e){
+    if(e.key!=="Enter" || e.target.tagName!=="INPUT") return;
+    if(!e.target.closest(".app, .planner")) return;
+    e.preventDefault();
+    var id=e.target.id||"";
+    if(id.indexOf("pl_")===0){ $("btnPlan").click(); }
+    else { $("btnCalc").click(); }
+  });
+
+  /* ---------- Navbar ---------- */
+  var navLinks = $("navLinks");
+  var navToggle = $("navToggle");
+  navToggle.addEventListener("click", function(){
+    var open = navLinks.classList.toggle("open");
+    navToggle.setAttribute("aria-expanded", open ? "true":"false");
+  });
+  navToggle.setAttribute("aria-expanded","false");
+  Array.prototype.forEach.call(document.querySelectorAll(".nav-link"), function(btn){
+    btn.addEventListener("click", function(){
+      var id = btn.getAttribute("data-target");
+      var el = document.getElementById(id);
+      if(el){
+        // scroll-margin-top di CSS sudah mengatur offset; hindari navigasi ganda
+        el.scrollIntoView({behavior:"smooth", block:"start"});
+      }
+      navLinks.classList.remove("open");
+      navToggle.setAttribute("aria-expanded","false");
+      setActiveNav(id);
+    });
+  });
+  function setActiveNav(id){
+    Array.prototype.forEach.call(document.querySelectorAll(".nav-link"), function(b){
+      b.classList.toggle("active", b.getAttribute("data-target")===id);
+    });
+  }
+  var sections = ["app","planner","guide","historyWrap"];
+  function updateActive(){
+    var mid = window.innerHeight/2;
+    var current = "app";
+    // pilih section TERAKHIR yang top <= mid (default "app" bila tak ada yang menutupi titik tengah,
+    // mis. di sela antar kartu atau di footer)
+    sections.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el && el.getBoundingClientRect().top <= mid) current = id;
+    });
+    setActiveNav(current);
+  }
+  window.addEventListener("scroll", updateActive, {passive:true});
+
+  /* ---------- Init ---------- */
+  attachFormatters();
+  loadHppDraft();
+  switchMode(mode,{silent:true});
+  loadPlanDraft();
+  // format field planner yang baru dimuat dari draft
+  ["pl_target","pl_hpp","pl_price","pl_dur","pl_workdays","pl_holiday","pl_capacity"].forEach(function(id){
+    formatField($(id));
+  });
+  renderPlanList();
+  renderHistory();
+  updateActive();
+  // expose toast untuk blok SW registration di luar IIFE (notifikasi "versi baru")
+  window.__toast = toast;
+})();
+
+/* ---------- PWA: register service worker ---------- */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      // deteksi SW baru aktif -> beri tahu pengguna muat ulang
+      reg.addEventListener("updatefound", function(){
+        var nw = reg.installing;
+        if(!nw) return;
+        nw.addEventListener("statechange", function(){
+          if(nw.state==="installed" && navigator.serviceWorker.controller){
+            // ada SW lama yang aktif & SW baru menunggu -> tampilkan toast
+            setTimeout(function(){
+              if(window.__toast) window.__toast("Versi baru tersedia — muat ulang halaman untuk memperbarui.","ok");
+            }, 800);
+          }
+        });
+      });
+    }).catch(function(){
+      /* SW gagal registrasi (mis. file://) — abaikan, aplikasi tetap jalan */
+    });
+  });
+}
+
+</script>
+</body>
+</html>
