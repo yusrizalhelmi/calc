@@ -1009,7 +1009,7 @@
       </table>
     </div>
 
-    <p class="note" style="margin-top:16px">💡 <b>Tips:</b> Pakai tombol <b>↻ Pakai Hasil HPP</b> setelah menghitung HPP agar perencanaan target konsisten dengan struktur biaya produk Anda. Angka omset mingguan/bulanan adalah <b>estimasi</b> (1 bulan = 30 hari, 1 minggu = 7 hari). Semua data tersimpan di perangkat (localStorage) — data perhitungan tidak dikirim ke server mana pun; hanya font Google Fonts yang diambil dari luar (di-cache service worker agar tetap tersedia offline).</p>
+    <p class="note" style="margin-top:16px">💡 <b>Tips:</b> Pakai tombol <b>↻ Pakai Hasil HPP</b> setelah menghitung HPP agar perencanaan target konsisten dengan struktur biaya produk Anda. Angka omset mingguan/bulanan adalah <b>estimasi</b> (1 bulan = 30 hari, 1 minggu = 7 hari). Semua data tersimpan di perangkat (localStorage) — data perhitungan tidak dikirim ke server mana pun. Situs ini hanya memakai statistik kunjungan anonim tanpa cookie (GoatCounter) dan font Google Fonts yang diambil dari luar (di-cache service worker agar tetap tersedia offline).</p>
   </div>
 </div>
 
@@ -1079,6 +1079,8 @@
 (function(){
   "use strict";
   var $ = function(id){return document.getElementById(id)};
+  // statistik pemakaian anonim (GoatCounter): hanya nama aksi, TIDAK mengirim isi input
+  function track(name){ try{ if(window.goatcounter && window.goatcounter.count) window.goatcounter.count({path:"event/"+name, title:name, event:true}); }catch(e){} }
   var STORAGE_KEY = "kalkulator_hpp_history_v2";
   var STORAGE_KEY_OLD = "kalkulator_hpp_history_v1";
   var DRAFT_HPP = "kalkulator_hpp_draft_hpp_v1";
@@ -1741,7 +1743,7 @@
         feasibility = "<b>✓ Target realistis:</b> sekitar <b>"+udCeil+" unit per hari kerja</b> selama "+unitLabel(p.unit,p.dur)+".";
       }
     }
-    var estNote = " <i>(estimasi: 1 bulan=30 hari, 1 minggu=7 hari)</i>";
+    var estNote = " <i>(estimasi: 1 bulan ≈ 52/12 minggu ≈ 30,4 hari)</i>";
     var warnNote = (p.planWarnings && p.planWarnings.length>0)
       ? " <span style='color:#c0392b'>⚠ "+escapeHtml(p.planWarnings.join(" "))+"</span>" : "";
     $("pr_note").innerHTML = feasibility +
@@ -1972,6 +1974,7 @@
     var r = calc(); renderResult(r); lastHppResult = r; hppDirty = false; return r;
   }
   $("btnCalc").addEventListener("click", function(){
+    track("hitung-hpp");
     var r=calc();
     renderResult(r);
     lastHppResult = r; hppDirty = false;
@@ -1981,16 +1984,19 @@
   });
   // Simpan & Bagikan pakai currentHpp(): menyimpan/membagikan angka yang sedang tampil (termasuk Harga Target)
   $("btnSaveHpp").addEventListener("click", function(){
+    track("simpan-hpp");
     var r = currentHpp();
     if(addHistory(r)){ toast("Hasil disimpan ke riwayat.","ok"); }
   });
   $("btnShareHpp").addEventListener("click", function(){
+    track("bagikan-hpp");
     var r = currentHpp();
     shareHpp(r);
   });
   // Hitung harga jual kotor agar margin tercapai (setelah diskon & fee)
   // Pakai calc(forcePrice) agar BEP, netPrice, warnings dst. dihitung konsisten di satu tempat.
   $("btnTargetPrice").addEventListener("click", function(){
+    track("harga-target");
     var base = calc();                 // ambil HPP/margin/diskon/fee dari input
     var tp = targetPriceFrom(base);    // harga kotor yang dipaksa
     if(tp<=0){ toast("Tidak bisa dihitung — periksa margin, diskon & fee (margin<100%, diskon<100%, fee<100%).","warn"); return; }
@@ -2004,7 +2010,7 @@
     toast("Harga jual "+fmt(tp)+" agar "+mLabel+" tercapai (setelah diskon & fee).","ok");
   });
 
-  $("btnExport").addEventListener("click", exportCSV);
+  $("btnExport").addEventListener("click", function(){ track("export-csv"); exportCSV(); });
   $("btnBackup").addEventListener("click", backupJSON);
   $("btnImport").addEventListener("click", function(){$("fileImport").click()});
   $("fileImport").addEventListener("change", function(e){
@@ -2020,6 +2026,7 @@
 
   /* Planner events */
   $("btnPlan").addEventListener("click", function(){
+    track("hitung-rencana");
     var p=calcPlan();
     renderPlan(p);
     savePlanDraft();
@@ -2027,11 +2034,13 @@
     if(window.innerWidth<760){ $("planResult").scrollIntoView({behavior:"smooth",block:"nearest"}); }
   });
   $("btnSavePlan").addEventListener("click", function(){
+    track("simpan-rencana");
     var p = calcPlan();
     renderPlan(p);
     if(addPlan(p)){ toast("Rencana disimpan.","ok"); }
   });
   $("btnSharePlan").addEventListener("click", function(){
+    track("bagikan-rencana");
     var p=calcPlan();
     renderPlan(p);
     if(p.target<=0){ toast("Isi target omset dulu.","warn"); return; }
@@ -2141,5 +2150,8 @@ if("serviceWorker" in navigator){
 }
 
 </script>
+
+<!-- Statistik kunjungan anonim (GoatCounter, tanpa cookie) -->
+<script data-goatcounter="https://rtkr.goatcounter.com/count" async src="https://gc.zgo.at/count.js"></script>
 </body>
 </html>

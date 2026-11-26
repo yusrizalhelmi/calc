@@ -1,6 +1,6 @@
 // Service Worker — Kalkulator HPP (offline cache)
 // Naikkan CACHE_VERSION setiap rilis agar user dapat update (network-first untuk navigasi).
-var CACHE_VERSION = "kalkulator-hpp-v4";
+var CACHE_VERSION = "kalkulator-hpp-v5";
 var CORE_ASSETS = [
   "./",
   "./index.html",
@@ -47,6 +47,9 @@ self.addEventListener("fetch", function(e){
   var req = e.request;
   if(req.method!=="GET") return;
   var url = new URL(req.url);
+
+  // Analitik (GoatCounter): biarkan browser menanganinya langsung, jangan di-cache.
+  if(url.hostname==="gc.zgo.at" || url.hostname.indexOf("goatcounter.com")>=0) return;
 
   // Navigasi (HTML): NETWORK-FIRST dengan batas 3 detik, fallback cache saat offline/timeout.
   if(req.mode === "navigate"){
