@@ -57,8 +57,8 @@ Buka file `index.html` langsung di browser (double-click). Tidak perlu server, t
    - Drag-and-drop lewat web GitHub, **atau**
    - Clone repo lalu salin file:
      ```bash
-     git clone https://github.com/<username>/kalkulator-hpp.git
-     cd kalkulator-hpp
+     git clone https://github.com/yusrizalhelmi/calc.git
+     cd calc
      cp ../index.html ../qris.jpg ../favicon.svg .
      cp ../icon-192.png ../icon-512.png ../apple-touch-icon.png ../og-image.png .
      cp ../manifest.json ../sw.js ../README.md .
@@ -108,7 +108,7 @@ kalkulator-hpp/
 
 > **Update PWA:** Service worker memakai strategi **network-first untuk navigasi** dengan **batas 3 detik** (`fetchTimeout`) agar di sinyal lemah cepat fallback ke cache (pengguna selalu dapat versi terbaru saat online, fallback cache saat offline/timeout) + **cache font Google** agar Nunito tetap tersedia offline. Hanya respons `ok` (status 200) yang di-cache. Naikkan `CACHE_VERSION` di `sw.js` setiap rilis agar cache lama dibersihkan.
 
-> **URL OG/canonical:** `og:image`, `og:url`, `twitter:image`, dan `canonical` di `index.html` memakai URL absolut `https://ratakiri.github.io/kalkulator-hpp/` (ganti dengan domain Anda yang sebenarnya sebelum deploy) agar pratinjau WhatsApp/Facebook menampilkan gambar dan tautan dengan benar.
+> **URL OG/canonical:** `og:image`, `og:url`, `twitter:image`, dan `canonical` di `index.html` memakai URL absolut `https://yusrizalhelmi.github.io/calc/` (ganti dengan domain Anda yang sebenarnya sebelum deploy) agar pratinjau WhatsApp/Facebook menampilkan gambar dan tautan dengan benar.
 
 ## Privasi data
 
